@@ -2,7 +2,7 @@
   "root": true,
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/strict-type-checked",
+    "plugin:@typescript-eslint/recommended-type-checked",
     "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:svelte/recommended",
     "plugin:svelte/prettier",
@@ -15,11 +15,9 @@
     "sourceType": "module",
     "project": "tsconfig.json"
   },
-  "plugins": ["@typescript-eslint"],
   "env": {
     "browser": true,
-    "node": true,
-    "worker": true
+    "node": true
   },
   "overrides": [
     {

@@ -2,7 +2,7 @@
   "name": "trusync",
   "version": "1.0.0-preview.1",
   "description": "JavaScript truSync implementation.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "private": true,
   "author": "Aidan Loughran",
   "repository": "github:aidlran/trusync",

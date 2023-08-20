@@ -1,0 +1,24 @@
+{
+  "name": "trusync",
+  "version": "1.0.0-preview.1",
+  "description": "JavaScript truSync implementation.",
+  "license": "MIT",
+  "private": true,
+  "author": "Aidan Loughran",
+  "repository": "github:aidlran/trusync",
+  "bugs": "https://github.com/aidlran/trusync/issues",
+  "homepage": "https://github.com/aidlran/trusync/tree/main/packages/lib-js#readme",
+  "main": "dist/public/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "openpgp": "^5.9.0"
+  },
+  "devDependencies": {
+    "@openpgp/web-stream-tools": "^0.0.14",
+    "typescript": "^5.1.0"
+  }
+}

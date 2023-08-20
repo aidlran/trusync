@@ -1,0 +1,29 @@
+{
+  "name": "trusync-monorepo",
+  "description": "Monorepo for all things truSync.",
+  "private": true,
+  "author": "Aidan Loughran",
+  "repository": "github:aidlran/trusync",
+  "bugs": "https://github.com/aidlran/trusync/issues",
+  "homepage": "https://github.com/aidlran/trusync#readme",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace packages/lib-js && npm run build --workspace packages/lib-svelte",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "start": "conc -kn js,svelte \"npm start --workspace packages/lib-js\" \"npm start --workspace packages/lib-svelte\""
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "concurrently": "^8.2.0",
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-svelte": "^2.32.4",
+    "prettier": "^3.0.2",
+    "prettier-plugin-svelte": "^3.0.3"
+  }
+}

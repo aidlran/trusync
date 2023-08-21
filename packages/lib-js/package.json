@@ -9,6 +9,7 @@
   "bugs": "https://github.com/aidlran/trusync/issues",
   "homepage": "https://github.com/aidlran/trusync/tree/main/packages/lib-js#readme",
   "main": "dist/public/index.js",
+  "bin": "dist/bin/trusync.js",
   "type": "module",
   "scripts": {
     "build": "tsc",

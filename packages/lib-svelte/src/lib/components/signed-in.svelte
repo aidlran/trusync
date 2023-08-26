@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Session } from '@enclavetech/api';
-  import { init } from '../functions/init.js';
+  import { Session } from 'trusync';
   import { goto } from '$app/navigation';
+  import { init } from '../functions/init.js';
 
   export let noAuthRedirect: string;
 

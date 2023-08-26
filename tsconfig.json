@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "preserveWatchOutput": true,
-    "resolveJsonModule": true,
-    "strict": true,
-    "verbatimModuleSyntax": true
+    "strict": true
   }
 }

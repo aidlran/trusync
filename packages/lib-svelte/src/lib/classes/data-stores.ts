@@ -1,4 +1,4 @@
-import { Data } from '@enclavetech/api';
+import { Data } from 'trusync';
 import { writable } from 'svelte/store';
 import type { DataStore } from '../interfaces/data-store.js';
 
@@ -23,7 +23,7 @@ export class DataStores {
       STORES_MAP.set(id, store);
     }
 
-    init?.then((data) => wrappedSet(data));
+    void init?.then((data) => wrappedSet(data));
 
     return store;
 
@@ -42,7 +42,7 @@ export class DataStores {
       if (!id) {
         throw new Error('Data is not initialised');
       }
-      Data.replaceByID(id, update).then((result) =>
+      void Data.replaceByID(id, update).then((result) =>
         wrappedSet({
           ...update,
           id: result.id,
@@ -65,7 +65,7 @@ export class DataStores {
     const store = this.STORES_MAP.get(id);
 
     if (store) {
-      return store;
+      return store as DataStore<T>;
     }
 
     return this.createStore<T>(
@@ -79,7 +79,7 @@ export class DataStores {
 
   getRoot<T extends { id: string }>(appID: number): DataStore<T> {
     if (this.root) {
-      return this.root;
+      return this.root as DataStore<T>;
     }
 
     return (this.root = this.createStore<T>(undefined, Data.pullRootData(appID) as Promise<T>));

@@ -1,15 +1,18 @@
 <script lang="ts">
   import { Session } from 'trusync';
   import { goto } from '$app/navigation';
-  import { init } from '../functions/init.js';
 
   export let noAuthRedirect: string;
 
-  init();
+  async function onNoAuth(): Promise<void> {
+    await goto(noAuthRedirect);
+  }
 
-  const initSession = Session.resume().catch(() => goto(noAuthRedirect));
+  async function resumeSession(): Promise<void> {
+    await Session.resume().catch(onNoAuth);
+  }
 </script>
 
-{#await initSession then}
+{#await resumeSession() then}
   <slot />
 {/await}

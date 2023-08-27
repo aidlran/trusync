@@ -1,11 +1,14 @@
+import { Hash } from './hash.js';
+import { RawData } from './raw-data.js';
+
 type MaybePromise<T> = T | Promise<T>;
-type GetResult = string | null | undefined;
+type GetResult<T> = T | null | undefined;
 
 export interface StorageDriver {
-  deleteData: (id: string) => MaybePromise<void>;
-  getData: (id: string) => MaybePromise<GetResult>;
-  putData: (id: string, data: string) => MaybePromise<void>;
-  deleteNamedData: (name: string) => MaybePromise<void>;
-  getNamedDataID: (name: string) => MaybePromise<GetResult>;
-  setNamedData: (name: string, id: string) => MaybePromise<void>;
+  deleteData: (hash: Hash) => MaybePromise<void>;
+  getData: (hash: Hash) => MaybePromise<GetResult<RawData>>;
+  putData: (rawData: RawData) => MaybePromise<void>;
+  unsetNamedDataHash: (name: string) => MaybePromise<void>;
+  getNamedDataHash: (name: string) => MaybePromise<GetResult<Hash>>;
+  setNamedDataHash: (name: string, hash: Hash) => MaybePromise<void>;
 }

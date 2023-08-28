@@ -1,8 +1,6 @@
-// TODO: @enclavetech/kv lib
-
 function kvStoreOpen(): Promise<IDBObjectStore> {
   return new Promise<IDBObjectStore>((resolve, reject) => {
-    const openRequest = indexedDB.open('enclave_km', 1);
+    const openRequest = indexedDB.open('trusync_kms', 1);
 
     openRequest.onupgradeneeded = (event: IDBVersionChangeEvent) => {
       (event.target as IDBOpenDBRequest).result.createObjectStore('kv', {

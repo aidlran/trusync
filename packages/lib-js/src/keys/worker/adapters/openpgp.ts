@@ -14,10 +14,14 @@ import {
   readKey,
   readMessage,
   readPrivateKey,
+  Key,
 } from 'openpgp';
 import type { IAdapter } from '../interfaces/adapter.js';
 
 export class Adapter implements IAdapter<PrivateKey, PublicKey, SessionKey> {
+  private readonly decoder = new TextDecoder();
+  private readonly encoder = new TextEncoder();
+
   async decryptPrivateKey(armoredKey: string, passphrase: string) {
     return await decryptKey({
       privateKey: await readPrivateKey({ armoredKey }),
@@ -95,20 +99,37 @@ export class Adapter implements IAdapter<PrivateKey, PublicKey, SessionKey> {
     return generateSessionKey({ encryptionKeys });
   }
 
-  parsePrivateKey(armoredKey: string) {
-    return readPrivateKey({ armoredKey });
+  private stringToBinaryKey(string: string): Uint8Array {
+    const intArray = new Array<number>();
+    for (let i = 0; i < string.length; i++) {
+      intArray.push(string.charCodeAt(i));
+    }
+    return Uint8Array.from(intArray);
   }
 
-  parsePublicKey(armoredKey: string) {
-    return readKey({ armoredKey });
+  parsePrivateKey(key: string): Promise<PrivateKey> {
+    return readPrivateKey({ binaryKey: this.stringToBinaryKey(key) });
   }
 
-  stringifyPrivateKey(key: PrivateKey) {
-    return key.armor();
+  parsePublicKey(key: string): Promise<PublicKey> {
+    return readKey({ binaryKey: this.stringToBinaryKey(key) });
   }
 
-  stringifyPublicKey(key: PublicKey) {
-    return key.armor();
+  private stringifyKey(key: Key): string {
+    const binaryKey = key.write();
+    let binaryKeyString = '';
+    for (const index in binaryKey) {
+      binaryKeyString += String.fromCharCode(binaryKey[index]);
+    }
+    return binaryKeyString;
+  }
+
+  stringifyPrivateKey(key: PrivateKey): string {
+    return this.stringifyKey(key);
+  }
+
+  stringifyPublicKey(key: PublicKey): string {
+    return this.stringifyKey(key);
   }
 
   async symmetricDecrypt(armoredMessage: string, passwords: string) {

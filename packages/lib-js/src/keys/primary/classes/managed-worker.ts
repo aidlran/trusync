@@ -27,7 +27,7 @@ export class ManagedWorker {
           callback(result);
         } else {
           console.warn(
-            `Enclave KMS: Job [${jobID}]: finished with status: ${JSON.stringify({
+            `truSync KMS: Job [${jobID}]: finished with status: ${JSON.stringify({
               ok: event.data.ok,
             })} but no callback found.`,
           );

@@ -1,12 +1,19 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { app } from '$lib/functions/app';
+  import { getApp } from '$lib/functions/get-app';
 
-  export let noAuthRedirect: string;
+  export let noAuthRedirect: string | undefined = undefined;
 
-  if (!app().signedIn) {
+  const app = getApp();
+
+  if (noAuthRedirect && !$app.sessionIsActive) {
     goto(noAuthRedirect);
   }
 </script>
 
-<slot />
+{#if $app.sessionIsActive}
+  <slot />
+  <slot name="auth" />
+{:else}
+  <slot name="noauth" />
+{/if}

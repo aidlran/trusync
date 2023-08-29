@@ -2,6 +2,7 @@
   import { setContext } from 'svelte';
   import { TrusyncApp, type StorageDriver } from 'trusync';
   import { APP_KEY } from '$lib/constants/context-keys.js';
+  import { trusyncAppStore } from '$lib/stores/trusync-app-store';
 
   export let drivers: StorageDriver[];
 
@@ -11,11 +12,7 @@
     app.pushStorageDriver(driver);
   }
 
-  setContext(APP_KEY, app);
-
-  interface $$Slots {
-    default: { app: TrusyncApp };
-  }
+  setContext(APP_KEY, trusyncAppStore(app));
 </script>
 
-<slot {app} />
+<slot />

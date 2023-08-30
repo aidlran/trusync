@@ -9,7 +9,7 @@ export class TrusyncApp {
   private readonly internalStorageDrivers = new Array<StorageDriver>();
   private readonly keyManagement = configuredKMS();
   private _sessionIsActive = false;
-  private _onIdentityChange?: () => unknown;
+  private _onChange?: () => unknown;
 
   get storageDrivers(): StorageDriver[] {
     // Expose a shallow clone
@@ -20,13 +20,13 @@ export class TrusyncApp {
     return this._sessionIsActive;
   }
 
-  set onIdentityChange(fn: () => unknown) {
-    this._onIdentityChange = fn;
+  set onChange(fn: () => unknown) {
+    this._onChange = fn;
   }
 
-  private emitIdentityChange(): void {
-    if (this._onIdentityChange) {
-      this._onIdentityChange();
+  private emitChange(): void {
+    if (this._onChange) {
+      this._onChange();
     }
   }
 
@@ -104,7 +104,7 @@ export class TrusyncApp {
       publicKey: keyPair.publicKey,
     });
     this._sessionIsActive = true;
-    this.emitIdentityChange();
+    this.emitChange();
     return keyPair;
   }
 }

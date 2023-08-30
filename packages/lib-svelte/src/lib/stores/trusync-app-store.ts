@@ -5,7 +5,7 @@ import type { TrusyncAppStore } from '$lib/types/trusync-app-store.type';
 export function trusyncAppStore(app: TrusyncApp): TrusyncAppStore {
   const { update, subscribe } = writable(app);
 
-  app.onIdentityChange = () => update(() => app);
+  app.onChange = () => update(() => app);
 
   return { subscribe };
 }

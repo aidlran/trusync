@@ -49,6 +49,31 @@ export class TrusyncApp {
     };
   }
 
+  async get(hash: Hash): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      void Promise.allSettled<Promise<void>>(
+        this.internalStorageDrivers.map(async (store) => {
+          const data = await store.getData(hash);
+          if (!data || data.hash.algorithm !== hash.algorithm || data.hash.value !== hash.value) {
+            return;
+          }
+          const validateHash = await this.hash(data.payload);
+          if (
+            data.hash.algorithm !== validateHash.algorithm ||
+            data.hash.value !== validateHash.value
+          ) {
+            return;
+          }
+          resolve(data.payload);
+        }),
+      ).then((results) => {
+        if (!results.find((promise) => promise.status === 'fulfilled' && promise.value)) {
+          reject(new Error(`truSync: data not found: '${hash.algorithm}:${hash.value}'`));
+        }
+      });
+    });
+  }
+
   /**
    * @throws {PromiseSettledResult<void>[]}
    */
@@ -68,6 +93,10 @@ export class TrusyncApp {
     if (!results.find((promise) => promise.status === 'fulfilled')) {
       throw results;
     }
+  }
+
+  getJSON<T>(hash: Hash): Promise<T> {
+    return this.get(hash).then((payload) => JSON.parse(payload) as T);
   }
 
   /**

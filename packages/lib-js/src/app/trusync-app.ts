@@ -155,6 +155,8 @@ export class TrusyncApp {
     if (!results.find((promise) => promise.status === 'fulfilled')) {
       throw results;
     }
+
+    return hash;
   }
 
   getNamedJSON<T>(name: string): Promise<T> {

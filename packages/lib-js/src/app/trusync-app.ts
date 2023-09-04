@@ -49,7 +49,10 @@ export class TrusyncApp {
     };
   }
 
-  async put(payload: string, mediaType = 'text/plain'): Promise<boolean> {
+  /**
+   * @throws {PromiseSettledResult<void>[]}
+   */
+  async put(payload: string, mediaType = 'text/plain'): Promise<void> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
       this.internalStorageDrivers.map(async (store) => {
@@ -61,14 +64,50 @@ export class TrusyncApp {
         });
       }),
     );
-    return !!results.find((result) => result.status === 'fulfilled');
+
+    if (!results.find((promise) => promise.status === 'fulfilled')) {
+      throw results;
+    }
   }
 
-  async putJSON<T>(payload: T): Promise<boolean> {
+  /**
+   * @throws {PromiseSettledResult<void>[]}
+   */
+  async putJSON<T>(payload: T): Promise<void> {
     return this.put(JSON.stringify(payload), 'application/json');
   }
 
-  async putNamed(payload: string, name: string, mediaType = 'text/plain'): Promise<boolean> {
+  getNamed(name: string): Promise<string> {
+    return new Promise<string>((resolve, reject) => {
+      void Promise.allSettled<Promise<void>>(
+        this.internalStorageDrivers.map(async (store) => {
+          const hash = await store.getNamedDataHash(name);
+          if (!hash) return;
+          const data = await store.getData(hash);
+          if (!data || data.hash.algorithm !== hash.algorithm || data.hash.value !== hash.value) {
+            return;
+          }
+          const validateHash = await this.hash(data.payload);
+          if (
+            data.hash.algorithm !== validateHash.algorithm ||
+            data.hash.value !== validateHash.value
+          ) {
+            return;
+          }
+          resolve(data.payload);
+        }),
+      ).then((results) => {
+        if (!results.find((promise) => promise.status === 'fulfilled' && promise.value)) {
+          reject(new Error(`truSync: named data not found: '${name}'`));
+        }
+      });
+    });
+  }
+
+  /**
+   * @throws {PromiseSettledResult<void>[]}
+   */
+  async putNamed(payload: string, name: string, mediaType = 'text/plain'): Promise<void> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
       this.internalStorageDrivers.map(async (store) => {
@@ -81,40 +120,21 @@ export class TrusyncApp {
         await store.setNamedDataHash(name, hash);
       }),
     );
-    return !!results.find((result) => result.status === 'fulfilled');
-  }
 
-  async putNamedJSON<T>(payload: T, name: string): Promise<boolean> {
-    return this.putNamed(JSON.stringify(payload), name, 'application/json');
+    if (!results.find((promise) => promise.status === 'fulfilled')) {
+      throw results;
+    }
   }
 
   getNamedJSON<T>(name: string): Promise<T> {
-    return new Promise<T>((resolve, reject) => {
-      void Promise.allSettled<Promise<boolean>[]>(
-        this.internalStorageDrivers.map(async (store) => {
-          const hash = await store.getNamedDataHash(name);
-          if (!hash) return false;
-          const data = await store.getData(hash);
-          if (!data || data.hash.algorithm !== hash.algorithm || data.hash.value !== hash.value) {
-            return false;
-          }
-          const validateHash = await this.hash(data.payload);
-          if (
-            data.hash.algorithm !== validateHash.algorithm ||
-            data.hash.value !== validateHash.value
-          ) {
-            return false;
-          }
-          resolve(JSON.parse(data.payload) as T);
-          return true;
-        }),
-      ).then((results) => {
-        console.log(results);
-        if (!results.find((promise) => promise.status === 'fulfilled' && promise.value)) {
-          reject(new Error(`truSync: named data not found: '${name}'`));
-        }
-      });
-    });
+    return this.getNamed(name).then((payload) => JSON.parse(payload) as T);
+  }
+
+  /**
+   * @throws {PromiseSettledResult<void>[]}
+   */
+  putNamedJSON(payload: unknown, name: string): Promise<void> {
+    return this.putNamed(JSON.stringify(payload), name, 'application/json');
   }
 
   async createIdentity(): Promise<{

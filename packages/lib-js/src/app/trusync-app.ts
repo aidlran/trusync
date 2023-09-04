@@ -77,7 +77,7 @@ export class TrusyncApp {
   /**
    * @throws {PromiseSettledResult<void>[]}
    */
-  async put(payload: string, mediaType = 'text/plain'): Promise<void> {
+  async put(payload: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
       this.internalStorageDrivers.map(async (store) => {
@@ -93,6 +93,8 @@ export class TrusyncApp {
     if (!results.find((promise) => promise.status === 'fulfilled')) {
       throw results;
     }
+
+    return hash;
   }
 
   getJSON<T>(hash: Hash): Promise<T> {
@@ -102,7 +104,7 @@ export class TrusyncApp {
   /**
    * @throws {PromiseSettledResult<void>[]}
    */
-  async putJSON<T>(payload: T): Promise<void> {
+  async putJSON<T>(payload: T): Promise<Hash> {
     return this.put(JSON.stringify(payload), 'application/json');
   }
 
@@ -136,7 +138,7 @@ export class TrusyncApp {
   /**
    * @throws {PromiseSettledResult<void>[]}
    */
-  async putNamed(payload: string, name: string, mediaType = 'text/plain'): Promise<void> {
+  async putNamed(payload: string, name: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
       this.internalStorageDrivers.map(async (store) => {
@@ -162,7 +164,7 @@ export class TrusyncApp {
   /**
    * @throws {PromiseSettledResult<void>[]}
    */
-  putNamedJSON(payload: unknown, name: string): Promise<void> {
+  putNamedJSON(payload: unknown, name: string): Promise<Hash> {
     return this.putNamed(JSON.stringify(payload), name, 'application/json');
   }
 

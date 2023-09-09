@@ -1,3 +1,5 @@
+> This README is deprecated. KMS is no longer a separate package.
+
 <div align=center>
 
 # [Enclave KMS](https://github.com/enclavetech/kms)

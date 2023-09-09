@@ -33,8 +33,8 @@
     "!dist/**/*.spec.*"
   ],
   "peerDependencies": {
-    "trusync": "*",
-    "svelte": "^4.0.0"
+    "svelte": "^4.0.0",
+    "trusync": "*"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.0",
@@ -45,6 +45,7 @@
     "publint": "^0.2.0",
     "svelte": "^4.2.0",
     "svelte-check": "^3.5.0",
+    "trusync": "file:../lib-js",
     "tslib": "^2.6.1",
     "typescript": "^5.1.6",
     "vite": "^4.4.9",

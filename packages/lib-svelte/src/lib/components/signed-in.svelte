@@ -1,17 +1,17 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { getApp } from '$lib/functions/get-app';
+  import { getIdentity } from '../functions/get-identity.js';
 
   export let noAuthRedirect: string | undefined = undefined;
 
-  const app = getApp();
+  const identity = getIdentity();
 
-  if (noAuthRedirect && !$app.sessionIsActive) {
-    goto(noAuthRedirect);
+  if (noAuthRedirect && !$identity.publicKey) {
+    void goto(noAuthRedirect);
   }
 </script>
 
-{#if $app.sessionIsActive}
+{#if $identity.publicKey}
   <slot />
   <slot name="auth" />
 {:else}

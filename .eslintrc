@@ -6,6 +6,7 @@
     "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:svelte/recommended",
     "plugin:svelte/prettier",
+    "plugin:deprecation/recommended",
     "plugin:prettier/recommended"
   ],
   "parser": "@typescript-eslint/parser",
@@ -30,6 +31,7 @@
     }
   ],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "off"
+    "@typescript-eslint/no-explicit-any": "off",
+    "deprecation/deprecation": "warn"
   }
 }

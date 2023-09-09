@@ -1,7 +1,7 @@
 import { getContext } from 'svelte';
-import { APP_KEY } from '$lib/constants/context-keys';
-import type { TrusyncAppStore } from '$lib/types/trusync-app-store.type';
+import type { TrusyncApp } from 'trusync';
+import { APP_KEY } from '../constants/context-keys';
 
-export function getApp(): TrusyncAppStore {
+export function getApp(): TrusyncApp {
   return getContext(APP_KEY);
 }

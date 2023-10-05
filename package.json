@@ -10,10 +10,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspace packages/lib-js && npm run build --workspace packages/lib-svelte",
+    "build": "npm run build -w packages/lib-js && npm run build -w packages/lib-svelte",
     "format": "prettier --write --plugin prettier-plugin-svelte .",
     "lint": "eslint .",
-    "start": "conc -kn js,svelte \"npm start --workspace packages/lib-js\" \"npm start --workspace packages/lib-svelte\""
+    "start": "conc -kn js,svelte \"npm start -w packages/lib-js\" \"npm start -w packages/lib-svelte\""
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.4.0",
@@ -21,7 +21,7 @@
     "concurrently": "^8.2.0",
     "eslint": "^8.47.0",
     "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-deprecation": "^1.5.0",
+    "eslint-plugin-deprecation": "^2.0.0",
     "eslint-plugin-prettier": "^5.0.0",
     "eslint-plugin-svelte": "^2.32.4",
     "prettier": "^3.0.2",

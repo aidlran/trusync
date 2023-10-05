@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@openpgp/web-stream-tools": "^0.0.14",
+    "jose": "^4.15.2",
     "typescript": "^5.1.0"
   }
 }

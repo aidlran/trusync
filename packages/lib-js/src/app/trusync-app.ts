@@ -4,18 +4,18 @@ import { StorageDriver } from '../storage/interfaces/storage-driver.js';
 
 export class TrusyncApp {
   constructor(
-    private readonly internalStorageDrivers: StorageDriver[],
+    private readonly _storageDrivers: StorageDriver[],
     readonly data: Data,
     readonly identity: Identity,
   ) {}
 
   get storageDrivers(): StorageDriver[] {
     // Expose a shallow clone
-    return [...this.internalStorageDrivers];
+    return [...this._storageDrivers];
   }
 
   pushStorageDriver(driver: StorageDriver): TrusyncApp {
-    this.internalStorageDrivers.push(driver);
+    this._storageDrivers.push(driver);
     return this;
   }
 }

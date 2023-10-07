@@ -2,7 +2,6 @@
   "compilerOptions": {
     "declaration": true,
     "declarationMap": true,
-    "preserveWatchOutput": true,
     "sourceMap": true,
     "strict": true
   }

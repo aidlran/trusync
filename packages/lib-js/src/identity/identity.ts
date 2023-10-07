@@ -2,7 +2,7 @@ import { Data } from '../data/data.js';
 import { KMS } from '../keys/configured-kms.js';
 
 export class Identity {
-  private _publicKey?: string;
+  private readonly _publicKeys = new Array<string>();
   onChange?: (identity: Identity) => void;
 
   constructor(
@@ -10,8 +10,9 @@ export class Identity {
     private readonly keyManagement: KMS,
   ) {}
 
-  get publicKey(): string | undefined {
-    return this._publicKey;
+  get publicKeys(): string[] {
+    // Expose a shallow clone
+    return [...this._publicKeys];
   }
 
   private emitChange(): void {
@@ -20,16 +21,29 @@ export class Identity {
     }
   }
 
-  async create(): Promise<{ privateKey: string; publicKey: string }> {
+  /**
+   * Create a new identity.
+   * @param immediateImport Whether to immediately import the identity. Defaults to `true`.
+   */
+  async create(immediateImport = true): Promise<{ privateKey: string; publicKey: string }> {
     const keyPair = await this.keyManagement.keys.generateKeyPair();
+    if (immediateImport) {
+      await this.import(keyPair.publicKey, keyPair.privateKey);
+    }
     await this.data.putNamedJSON({ publicKey: keyPair.publicKey }, keyPair.publicKey);
-    await this.keyManagement.keys.import({
-      keyID: keyPair.publicKey,
-      privateKey: keyPair.privateKey,
-      publicKey: keyPair.publicKey,
-    });
-    this._publicKey = keyPair.publicKey;
-    this.emitChange();
     return keyPair;
+  }
+
+  /**
+   * Import an existing identity.
+   */
+  async import(publicKey: string, privateKey: string): Promise<void> {
+    await this.keyManagement.keys.import({
+      keyID: publicKey,
+      privateKey,
+      publicKey,
+    });
+    this._publicKeys.push(publicKey);
+    this.emitChange();
   }
 }

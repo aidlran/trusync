@@ -5,13 +5,17 @@
   export let noAuthRedirect: string | undefined = undefined;
 
   const identity = getIdentity();
+  let hasIdentity: boolean;
 
-  if (noAuthRedirect && !$identity.publicKey) {
+  $: hasIdentity = !!$identity.publicKeys.length;
+  
+
+  if (noAuthRedirect && !hasIdentity) {
     void goto(noAuthRedirect);
   }
 </script>
 
-{#if $identity.publicKey}
+{#if hasIdentity}
   <slot />
   <slot name="auth" />
 {:else}

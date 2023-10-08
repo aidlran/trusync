@@ -13,6 +13,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "lc": "echo truSync JS: $(find bin src -type f -exec cat {} \\; | wc -l) lines",
     "start": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {

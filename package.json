@@ -12,7 +12,7 @@
   "scripts": {
     "build": "npm run build --workspaces",
     "format": "prettier --write --plugin prettier-plugin-svelte .",
-    "lc": "echo truSync: $(find packages/lib-js/bin packages/*/src -type f -exec cat {} \\; | wc -l) lines",
+    "lc": "npm run lc --workspaces",
     "lint": "eslint .",
     "start": "conc -kn js,svelte \"npm start -w packages/lib-js\" \"npm start -w packages/lib-svelte\""
   },

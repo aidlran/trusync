@@ -1,6 +1,6 @@
-import { EnclaveKmsError } from '../../shared/errors/enclave-kms.error.js';
+import { KeyManagerError } from '../../shared/errors/key-manager.error.js';
 
-export class WrappedAdapterError extends EnclaveKmsError {
+export class WrappedAdapterError extends KeyManagerError {
   constructor(
     readonly adapterName: string,
     readonly fnName: string,

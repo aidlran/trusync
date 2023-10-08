@@ -1,7 +1,7 @@
 import type { Action } from '../types/action.js';
-import { EnclaveKmsError } from './enclave-kms.error.js';
+import { KeyManagerError } from './key-manager.error.js';
 
-export class EnclaveKmsActionError<T extends Action> extends EnclaveKmsError {
+export class KeyManagerActionError<T extends Action> extends KeyManagerError {
   constructor(
     readonly action: T,
     errorMessage: string,

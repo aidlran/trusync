@@ -1,4 +1,4 @@
-import { EnclaveKmsActionError } from '../../shared/errors/enclave-kms-action.error.js';
+import { KeyManagerActionError } from '../../shared/errors/key-manager-action.error.js';
 import type { Action, Job } from '../../shared/types/index.js';
 import type { KeyPair } from '../interfaces/key-pair.js';
 
@@ -21,7 +21,7 @@ export class KeyPairMap<PrivateKeyType, PublicKeyType>
     const keyPair = this.keyPairMap.get(id);
 
     if (!keyPair) {
-      throw new EnclaveKmsActionError(job.action, `Key pair with ID ${id} not found`);
+      throw new KeyManagerActionError(job.action, `Key pair with ID ${id} not found`);
     }
 
     return keyPair;
@@ -31,7 +31,7 @@ export class KeyPairMap<PrivateKeyType, PublicKeyType>
     const { privateKey } = this.get(id, job);
 
     if (!privateKey) {
-      throw new EnclaveKmsActionError(
+      throw new KeyManagerActionError(
         job.action,
         `We do not have the private key for key pair ID ${id}`,
       );

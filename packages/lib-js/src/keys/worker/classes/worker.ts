@@ -1,4 +1,4 @@
-import { EnclaveKmsActionError, EnclaveKmsError } from '../../shared/index.js';
+import { KeyManagerActionError, KeyManagerError } from '../../shared/index.js';
 import type { Action, CompletedJob, FailedJob, Job } from '../../shared/types/index.js';
 import type { IAdapter, KeyPair, Session, SessionKey } from '../interfaces/index.js';
 import { kvStoreDelete, kvStoreGet, kvStoreSet } from '../utils/db.js';
@@ -40,10 +40,12 @@ export class Worker<PrivateKeyType, PublicKeyType, SessionKeyType> {
   ): Promise<Awaited<T>> {
     try {
       return await fn();
-    } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'Unknown error';
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.errorResponse(errorMessage, job);
-      throw e instanceof EnclaveKmsError ? e : new EnclaveKmsActionError(job.action, errorMessage);
+      throw error instanceof KeyManagerError
+        ? error
+        : new KeyManagerActionError(job.action, errorMessage);
     }
   }
 
@@ -269,7 +271,7 @@ export class Worker<PrivateKeyType, PublicKeyType, SessionKeyType> {
       const sessionEncrypted = job.payload.sessionPayload;
 
       const key = await kvStoreGet('session_key').catch(() => {
-        throw new EnclaveKmsActionError(job.action, 'No session key found');
+        throw new KeyManagerActionError(job.action, 'No session key found');
       });
 
       const sessionDecrypted = await this.adapter.symmetricDecrypt(sessionEncrypted, key);
@@ -278,7 +280,7 @@ export class Worker<PrivateKeyType, PublicKeyType, SessionKeyType> {
         try {
           return JSON.parse(sessionDecrypted) as Session;
         } catch (e) {
-          throw new EnclaveKmsActionError(job.action, 'Unable to parse session data');
+          throw new KeyManagerActionError(job.action, 'Unable to parse session data');
         }
       })();
 

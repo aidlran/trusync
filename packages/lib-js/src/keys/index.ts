@@ -1,1 +1,1 @@
-export * from './configured-kms.js';
+export * from './primary/classes/key-manager.js';

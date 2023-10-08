@@ -3,15 +3,19 @@ import type { Action, Request, Result } from '../../shared/types/index.js';
 import { ManagedWorker } from './managed-worker.js';
 
 export class KeyManager {
-  private readonly cluster: ManagedWorker[] = Array.from(
-    // TODO: test this on Safari
-    { length: Math.ceil(navigator.hardwareConcurrency / 2) },
-    () => new ManagedWorker(),
-  );
+  private readonly cluster: ManagedWorker[];
 
   private readonly _importedKeys = new Array<string>();
 
   private currentWorker = 0;
+
+  constructor(workerConstructor: () => Worker) {
+    this.cluster = Array.from(
+      // TODO: test this on Safari
+      { length: Math.ceil(navigator.hardwareConcurrency / 2) },
+      () => new ManagedWorker(workerConstructor),
+    );
+  }
 
   get importedKeys() {
     return structuredClone(this._importedKeys);

@@ -1,13 +1,15 @@
 import type { Action, CompletedJob, FailedJob, Request, Result } from '../../shared/types/index.js';
 
 export class ManagedWorker {
-  private readonly worker = new Worker(new URL('../../worker/worker.js?worker', import.meta.url), {
-    type: 'module',
-  });
+  private readonly worker: Worker;
 
   private pendingJobs = new Map<number, (result: Result<Action>) => void>();
 
   private jobCounter = 0;
+
+  constructor(workerConstructor: () => Worker) {
+    this.worker = workerConstructor();
+  }
 
   postJob<T extends Action>(payload: Request<T>): Promise<Result<T>> {
     return new Promise<Result<T>>((resolve, reject) => {

@@ -19,9 +19,6 @@ import {
 import type { IAdapter } from '../interfaces/adapter.js';
 
 export class Adapter implements IAdapter<PrivateKey, PublicKey, SessionKey> {
-  private readonly decoder = new TextDecoder();
-  private readonly encoder = new TextEncoder();
-
   async decryptPrivateKey(armoredKey: string, passphrase: string) {
     return await decryptKey({
       privateKey: await readPrivateKey({ armoredKey }),

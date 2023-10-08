@@ -1,8 +1,8 @@
-import { TrusyncApp } from './app/trusync-app.js';
-import { Data } from './data/data.js';
-import { Identity } from './identity/identity.js';
-import { KeyManager } from './keys/primary/classes/key-manager.js';
-import { StorageDriver } from './storage/interfaces/storage-driver.js';
+import { TrusyncApp } from './app/trusync-app';
+import { Data } from './data/data';
+import { Identity } from './identity/identity';
+import { KeyManager } from './keys/primary/classes/key-manager';
+import type { StorageDriver } from './storage/interfaces/storage-driver';
 
 export * from './storage';
 export type { Data, Identity, TrusyncApp };

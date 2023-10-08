@@ -1,7 +1,5 @@
-import { getHash, getHashKey } from '../functions/hash-key.js';
-import type { Hash } from '../interfaces/hash.js';
-import type { RawData } from '../interfaces/raw-data.js';
-import type { StorageDriver } from '../interfaces/storage-driver.js';
+import { getHash, getHashKey } from '../functions/hash-key';
+import type { Hash, RawData, StorageDriver } from '../interfaces';
 
 /**
  * Localstorage driver for testing and development.

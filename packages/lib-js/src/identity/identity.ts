@@ -1,4 +1,4 @@
-import type { Data } from '../data/data.js';
+import type { Data } from '../data/data';
 import type { KeyManager } from '../keys/primary/classes/key-manager.js';
 
 export class Identity {

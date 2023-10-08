@@ -1,5 +1,5 @@
-import { Hash } from './hash.js';
-import { RawData } from './raw-data.js';
+import type { Hash } from './hash';
+import type { RawData } from './raw-data';
 
 type MaybePromise<T> = T | Promise<T>;
 type GetResult<T> = T | null | undefined;

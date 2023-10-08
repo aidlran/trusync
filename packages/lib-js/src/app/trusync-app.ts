@@ -1,6 +1,6 @@
-import { Data } from '../data/data.js';
-import { Identity } from '../identity/identity.js';
-import { StorageDriver } from '../storage/interfaces/storage-driver.js';
+import type { Data } from '../data/data';
+import type { Identity } from '../identity/identity';
+import type { StorageDriver } from '../storage/interfaces/storage-driver';
 
 export class TrusyncApp {
   constructor(

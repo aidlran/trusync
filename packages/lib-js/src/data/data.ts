@@ -1,4 +1,4 @@
-import type { Hash, StorageDriver } from '../storage';
+import type { Hash, StorageDriver } from '../storage/interfaces';
 
 export class Data {
   constructor(private readonly storageDrivers: StorageDriver[]) {}

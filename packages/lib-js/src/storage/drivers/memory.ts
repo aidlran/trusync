@@ -1,7 +1,5 @@
-import { type HashKey, getHashKey, getHash } from '../functions/hash-key.js';
-import type { Hash } from '../interfaces/hash.js';
-import type { RawData } from '../interfaces/raw-data.js';
-import type { StorageDriver } from '../interfaces/storage-driver.js';
+import { type HashKey, getHashKey, getHash } from '../functions/hash-key';
+import type { Hash, RawData, StorageDriver } from '../interfaces';
 
 export class MemoryDriver implements StorageDriver {
   private readonly data = new Map<HashKey, RawData>();

@@ -1,4 +1,4 @@
-import { Hash } from './hash';
+import type { Hash } from './hash';
 
 export interface RawData {
   hash: Hash;

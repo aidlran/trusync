@@ -8,7 +8,6 @@
   let hasIdentity: boolean;
 
   $: hasIdentity = !!$identity.publicKeys.length;
-  
 
   if (noAuthRedirect && !hasIdentity) {
     void goto(noAuthRedirect);

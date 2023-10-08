@@ -8,9 +8,7 @@
     "plugin:svelte/prettier",
     "plugin:prettier/recommended"
   ],
-  "plugins": [
-    "deprecation"
-  ],
+  "plugins": ["deprecation"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,

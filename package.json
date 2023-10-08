@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w packages/lib-js && npm run build -w packages/lib-svelte",
+    "build": "npm run build --workspaces",
     "format": "prettier --write --plugin prettier-plugin-svelte .",
     "lint": "eslint .",
     "start": "conc -kn js,svelte \"npm start -w packages/lib-js\" \"npm start -w packages/lib-svelte\""

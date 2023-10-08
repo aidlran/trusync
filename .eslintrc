@@ -6,8 +6,10 @@
     "plugin:@typescript-eslint/stylistic-type-checked",
     "plugin:svelte/recommended",
     "plugin:svelte/prettier",
-    "plugin:deprecation/recommended",
     "plugin:prettier/recommended"
+  ],
+  "plugins": [
+    "deprecation"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -24,14 +26,10 @@
     {
       "files": ["*.svelte"],
       "parser": "svelte-eslint-parser",
-      "parserOptions": { "parser": "@typescript-eslint/parser" },
-      "rules": {
-        "@typescript-eslint/no-unused-vars": "off"
-      }
+      "parserOptions": { "parser": "@typescript-eslint/parser" }
     }
   ],
   "rules": {
-    "@typescript-eslint/no-explicit-any": "off",
     "deprecation/deprecation": "warn"
   }
 }

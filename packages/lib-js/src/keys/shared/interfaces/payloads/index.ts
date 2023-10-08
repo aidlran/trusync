@@ -3,6 +3,7 @@ export * from './crypt.result.js';
 export * from './encrypt-private-key.request.js';
 export * from './encrypt-private-key.result.js';
 export * from './export-session.result.js';
+export * from './generate-identity-result.js';
 export * from './generate-key-pair.request.js';
 export * from './generate-key-pair.result.js';
 export * from './hybrid-decrypt.request.js';

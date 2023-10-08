@@ -168,6 +168,12 @@ export class Worker<PrivateKeyType, PublicKeyType, SessionKeyType> {
       };
     }, job);
 
+  private generateIdentity(
+    job: Job<'generateIdentity'>,
+  ): Promise<CompletedJob<'generateIdentity'>> {
+    throw this.errorResponse('Not implemented.', job);
+  }
+
   private generateKeyPair = (
     job: Job<'generateKeyPair'>,
   ): Promise<CompletedJob<'generateKeyPair'>> =>

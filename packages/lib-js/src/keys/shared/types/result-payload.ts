@@ -12,6 +12,7 @@ export type ResultPayload =
   | ActionMixin<'destroySession'>
   | Payload<'encryptPrivateKey', Payloads.EncryptPrivateKeyResult>
   | Payload<'exportSession', Payloads.ExportSessionResult>
+  | Payload<'generateIdentity', Payloads.GenerateIdentityResult>
   | Payload<'generateKeyPair', Payloads.GenerateKeyPairResult>
   | Payload<'hybridEncrypt', Payloads.HybridEncryptResult>
   | Payload<'importKeyPair', Payloads.ImportKeysResult>

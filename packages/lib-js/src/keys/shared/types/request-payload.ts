@@ -8,7 +8,7 @@ export type RequestPayload =
       'asymmetricDecrypt' | 'asymmetricEncrypt' | 'hybridEncrypt',
       Payloads.AsymmetricCryptPayload
     >
-  | ActionMixin<'destroySession' | 'exportSession'>
+  | ActionMixin<'destroySession' | 'exportSession' | 'generateIdentity'>
   | Payload<'encryptPrivateKey', Payloads.EncryptPrivateKeyRequest>
   | Payload<'generateKeyPair', Payloads.GenerateKeyPairRequest | undefined>
   | Payload<'hybridDecrypt', Payloads.HybridDecryptRequest>

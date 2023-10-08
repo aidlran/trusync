@@ -4,6 +4,7 @@ export type Action =
   | 'destroySession'
   | 'encryptPrivateKey'
   | 'exportSession'
+  | 'generateIdentity'
   | 'generateKeyPair'
   | 'hybridDecrypt'
   | 'hybridEncrypt'

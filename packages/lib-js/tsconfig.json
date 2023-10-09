@@ -4,10 +4,8 @@
     "module": "ESNext",
     "moduleResolution": "Node10",
     "outDir": "./dist",
-    "target": "ES2015"
-
-    // TODO: openpgpjs breaks this
-    // "verbatimModuleSyntax": true
+    "target": "ES2015",
+    "verbatimModuleSyntax": true
   },
   "include": ["bin", "src"]
 }

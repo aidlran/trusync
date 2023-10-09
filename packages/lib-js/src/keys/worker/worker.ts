@@ -1,44 +1,38 @@
 import * as nacl from 'tweetnacl';
-import { KeyManagerActionError, KeyManagerError } from '../shared';
-import type { GenerateIdentityResult } from '../shared/interfaces/payloads/generate-identity-result';
-import { Action } from '../shared/types';
-import Adapter from './adapters/openpgp';
-import { Worker } from './classes/worker';
+import { concatenateByteArray } from '../../crypto/common/buffer-utils';
+import { sha256 } from '../../crypto/hash/sha256';
+import { base58 } from '../../crypto/encode/base';
+import { type GenerateIdentityResult, KeyManagerActionError, KeyManagerError } from '../shared';
+import type { Action } from '../shared/types';
 
 interface Job {
   action: Action;
   jobID: number;
 }
 
-const newWorker = false;
+self.onmessage = async (event: MessageEvent<Job>) => {
+  const { action, jobID } = event.data;
 
-if (!newWorker) {
-  new Worker(new Adapter());
-} else {
-  self.onmessage = (event: MessageEvent<Job>) => {
-    const { action, jobID } = event.data;
+  if (!action) {
+    throw errorResponse('No action was provided.', action, jobID);
+  }
 
-    if (!action) {
-      throw errorResponse('No action was provided.', action, jobID);
+  const result = await (() => {
+    switch (action) {
+      case 'generateIdentity':
+        return generateIdentity();
+      default:
+        throw errorResponse('This action is not supported.', action, jobID);
     }
+  })();
 
-    const result = (() => {
-      switch (action) {
-        case 'generateIdentity':
-          return generateIdentity();
-        default:
-          throw errorResponse('This action is not supported.', action, jobID);
-      }
-    })();
-
-    self.postMessage({
-      action,
-      jobID,
-      ok: true,
-      payload: result,
-    });
-  };
-}
+  self.postMessage({
+    action,
+    jobID,
+    ok: true,
+    payload: result,
+  });
+};
 
 function errorResponse(error: string, action?: Action, jobID?: number): KeyManagerError {
   self.postMessage({
@@ -55,14 +49,18 @@ function errorResponse(error: string, action?: Action, jobID?: number): KeyManag
   }
 }
 
-function generateIdentity(): GenerateIdentityResult {
+async function generateIdentity(): Promise<GenerateIdentityResult> {
   const { publicKey: publicEncryptionKey, secretKey: secretEncryptionKey } = nacl.box.keyPair();
 
   const { publicKey: publicSigningKey } = nacl.sign.keyPair.fromSeed(secretEncryptionKey);
 
+  const addressByteArray = concatenateByteArray(publicEncryptionKey, publicSigningKey);
+  const addressHash = await sha256(addressByteArray);
+  const addressEncoded = base58.encode(addressHash);
+
   return {
     address: {
-      value: '',
+      value: addressEncoded,
       type: 0,
     },
     encryption: {

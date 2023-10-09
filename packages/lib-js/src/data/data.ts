@@ -1,19 +1,13 @@
+import { base64, sha256 } from '../crypto';
 import type { Hash, StorageDriver } from '../storage/interfaces';
 
 export class Data {
   constructor(private readonly storageDrivers: StorageDriver[]) {}
 
   private async hash(payload: string): Promise<Hash> {
-    const hashBytes = new Uint8Array(
-      await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload)),
-    );
-    let hashBinary = '';
-    for (const index in hashBytes) {
-      hashBinary += String.fromCharCode(hashBytes[index]);
-    }
     return {
       algorithm: 'sha256',
-      value: btoa(hashBinary),
+      value: base64.encode(await sha256(payload)),
     };
   }
 

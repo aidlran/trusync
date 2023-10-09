@@ -1,5 +1,6 @@
 import type { Data } from '../data/data';
 import type { KeyManager } from '../keys/primary/classes/key-manager.js';
+import type { GenerateIdentityResult } from '../keys/shared';
 
 export class Identity {
   onChange?: (identity: Identity) => void;
@@ -22,15 +23,17 @@ export class Identity {
 
   /**
    * Create a new identity.
-   * @param immediateImport Whether to immediately import the identity. Defaults to `true`.
    */
-  async create(immediateImport = true): Promise<{ privateKey: string; publicKey: string }> {
-    const keyPair = await this.keyManager.generateKeyPair();
-    if (immediateImport) {
-      await this.import(keyPair.publicKey, keyPair.privateKey);
-    }
-    await this.data.putNamedJSON({ publicKey: keyPair.publicKey }, keyPair.publicKey);
-    return keyPair;
+  async create(): Promise<GenerateIdentityResult> {
+    const identity = await this.keyManager.generateIdentity();
+    await this.data.putNamedJSON(
+      {
+        encryption: identity.encryption,
+        signing: identity.signing,
+      },
+      identity.address.value,
+    );
+    return identity;
   }
 
   /**

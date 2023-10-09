@@ -4,6 +4,7 @@ import { Identity } from './identity/identity';
 import { KeyManager } from './keys/primary/classes/key-manager';
 import type { StorageDriver } from './storage/interfaces/storage-driver';
 
+export * from './crypto';
 export * from './storage';
 export type { Data, Identity, TrusyncApp };
 

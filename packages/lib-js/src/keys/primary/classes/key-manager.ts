@@ -64,6 +64,10 @@ export class KeyManager {
     return (await this.postToOne({ action: 'exportSession' })).payload;
   }
 
+  async generateIdentity(): Promise<Payload.GenerateIdentityResult> {
+    return (await this.postToOne({ action: 'generateIdentity' })).payload;
+  }
+
   async generateKeyPair(
     payload?: Payload.GenerateKeyPairRequest,
   ): Promise<Payload.GenerateKeyPairResult> {

@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "Node10",
+    "moduleResolution": "Node",
     "outDir": "./dist",
     "target": "ES2015",
     "verbatimModuleSyntax": true

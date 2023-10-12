@@ -1,6 +1,6 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { getIdentity } from '../functions/get-identity.js';
+  import { getIdentity } from '../functions/get-identity';
 
   export let noAuthRedirect: string | undefined = undefined;
 

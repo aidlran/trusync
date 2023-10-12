@@ -1,5 +1,6 @@
-import type { SessionPayload } from './session-payload.js';
+import type { SessionPayload } from './session-payload';
 
+/** @deprecated */
 export interface ImportSessionRequest<T extends boolean> extends SessionPayload {
   /**
    * Whether to immediately re-export the session with a new key.

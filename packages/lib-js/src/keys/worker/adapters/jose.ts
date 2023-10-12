@@ -8,8 +8,8 @@ import {
   generateKeyPair,
   importJWK,
 } from 'jose';
-import { AdapterError } from '../errors/adapter-error.js';
-import type { IAdapter } from '../interfaces/adapter.js';
+import { AdapterError } from '../errors/adapter-error';
+import type { IAdapter } from '../interfaces/adapter';
 
 // TODO: review algorithms
 // eventually they'll be configurable, but we'll have sensible defaults

@@ -1,6 +1,6 @@
-import { KeyManagerActionError } from '../../shared/errors/key-manager-action.error.js';
-import type { Action, Job } from '../../shared/types/index.js';
-import type { KeyPair } from '../interfaces/key-pair.js';
+import { KeyManagerActionError } from '../../shared/errors/key-manager-action.error';
+import type { Action, Job } from '../../shared/types';
+import type { KeyPair } from '../interfaces/key-pair';
 
 export class KeyPairMap<PrivateKeyType, PublicKeyType>
   implements Iterable<[string, KeyPair<PrivateKeyType, PublicKeyType>]>

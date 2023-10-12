@@ -16,7 +16,7 @@ import {
   readPrivateKey,
   Key,
 } from 'openpgp';
-import type { IAdapter } from '../interfaces/adapter.js';
+import type { IAdapter } from '../interfaces/adapter';
 
 export class Adapter implements IAdapter<PrivateKey, PublicKey, SessionKey> {
   async decryptPrivateKey(armoredKey: string, passphrase: string) {

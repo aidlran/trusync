@@ -1,6 +1,6 @@
-import type { IAdapter } from '../interfaces/adapter.js';
-import { AdapterError } from '../errors/adapter-error.js';
-import { WrappedAdapterError } from '../errors/wrapped-adapter-error.js';
+import type { IAdapter } from '../interfaces/adapter';
+import { AdapterError } from '../errors/adapter-error';
+import { WrappedAdapterError } from '../errors/wrapped-adapter-error';
 
 export class WrappedAdapter<PrivateKeyType, PublicKeyType, SessionKeyType>
   implements IAdapter<PrivateKeyType, PublicKeyType, SessionKeyType>

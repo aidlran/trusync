@@ -1,5 +1,5 @@
-import type { Action } from '../types/action.js';
-import { KeyManagerError } from './key-manager.error.js';
+import type { Action } from '../types/action';
+import { KeyManagerError } from './key-manager.error';
 
 export class KeyManagerActionError<T extends Action> extends KeyManagerError {
   constructor(

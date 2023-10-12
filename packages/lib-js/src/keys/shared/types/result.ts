@@ -1,6 +1,6 @@
-import type { ActionMixin } from '../interfaces/mixins/action.mixin.js';
-import type { Action } from './action.js';
-import type { ResultPayload } from './result-payload.js';
+import type { ActionMixin } from '../interfaces/mixins/action.mixin';
+import type { Action } from './action';
+import type { ResultPayload } from './result-payload';
 
 /** Used internally for communication from workers. */
 export type Result<A extends Action> = ActionMixin<A> &

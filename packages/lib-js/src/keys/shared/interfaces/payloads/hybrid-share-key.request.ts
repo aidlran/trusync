@@ -1,3 +1,4 @@
+/** @deprecated */
 export interface HybridShareKeyRequest {
   /** The session key to re-encrypt. */
   sessionKey: string;

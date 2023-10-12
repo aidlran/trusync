@@ -1,4 +1,7 @@
-/** A key pair, entire or partial, to import. */
+/**
+ * A key pair, entire or partial, to import.
+ * @deprecated
+ */
 export interface ImportKeyRequest {
   /** A private key string to import. */
   privateKey?: string;

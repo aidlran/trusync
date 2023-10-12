@@ -1,4 +1,4 @@
-import type { Action, CompletedJob, FailedJob, Request, Result } from '../../shared/types/index.js';
+import type { Action, CompletedJob, FailedJob, Request, Result } from '../../shared/types';
 
 export class ManagedWorker {
   private readonly worker: Worker;

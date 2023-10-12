@@ -1,4 +1,4 @@
-import type { MaybePromise } from '../../shared/types/maybe.js';
+import type { MaybePromise } from '../../shared/types/maybe';
 
 // TODO: allow library to define options objects
 

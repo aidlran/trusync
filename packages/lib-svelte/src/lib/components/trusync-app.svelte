@@ -1,7 +1,7 @@
 <script lang="ts">
   import { setContext } from 'svelte';
   import { trusyncApp, type StorageDriver } from 'trusync';
-  import { APP_KEY, IDENTITY_KEY } from '../constants/context-keys.js';
+  import { APP_KEY, IDENTITY_KEY } from '../constants/context-keys';
   import { identityStore } from '../stores/trusync-identity-store';
 
   export let drivers: StorageDriver[];

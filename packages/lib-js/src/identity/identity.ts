@@ -1,5 +1,5 @@
 import type { Data } from '../data/data';
-import type { KeyManager } from '../keys/primary/classes/key-manager.js';
+import type { KeyManager } from '../keys/primary/classes/key-manager';
 import type { GenerateIdentityResult } from '../keys/shared';
 
 export class Identity {
@@ -38,13 +38,12 @@ export class Identity {
 
   /**
    * Import an existing identity.
+   * @param {string} address The address string of the identity.
+   * @param {Uint8Array} secret The secret key of the identity as raw bytes.
+   * @returns {Promise<void>} A Promise that resolves on success.
    */
-  async import(publicKey: string, privateKey: string): Promise<void> {
-    await this.keyManager.importKeyPair({
-      keyID: publicKey,
-      privateKey,
-      publicKey,
-    });
+  async import(address: string, secret: Uint8Array): Promise<void> {
+    await this.keyManager.importIdentity(address, secret);
     this.emitChange();
   }
 }

@@ -1,4 +1,4 @@
-import { KeyManagerError } from '../../shared/errors/key-manager.error.js';
+import { KeyManagerError } from '../../shared/errors/key-manager.error';
 
 export class WrappedAdapterError extends KeyManagerError {
   constructor(

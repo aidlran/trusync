@@ -7,7 +7,7 @@
   const identity = getIdentity();
   let hasIdentity: boolean;
 
-  $: hasIdentity = !!$identity.publicKeys.length;
+  $: hasIdentity = !!$identity.importedAddresses.length;
 
   if (noAuthRedirect && !hasIdentity) {
     void goto(noAuthRedirect);

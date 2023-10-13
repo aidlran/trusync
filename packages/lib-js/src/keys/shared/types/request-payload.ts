@@ -10,6 +10,7 @@ export type RequestPayload =
   //   >
   | ActionMixin</*'destroySession' | 'exportSession' | */ 'generateIdentity'>
   // | Payload<'encryptPrivateKey', Payloads.EncryptPrivateKeyRequest>
+  | Payload<'forgetIdentity', Payloads.ForgetIdentityRequest>
   // | Payload<'generateKeyPair', Payloads.GenerateKeyPairRequest | undefined>
   // | Payload<'hybridDecrypt', Payloads.HybridDecryptRequest>
   | Payload<'importIdentity', Payloads.ImportIdentityRequest>;

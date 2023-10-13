@@ -10,9 +10,8 @@ export class Identity {
     private readonly keyManager: KeyManager,
   ) {}
 
-  get publicKeys(): string[] {
-    // Expose a shallow clone
-    return this.keyManager.importedKeys;
+  get importedAddresses(): string[] {
+    return this.keyManager.importedAddresses;
   }
 
   private emitChange(): void {
@@ -22,9 +21,9 @@ export class Identity {
   }
 
   /**
-   * Create a new identity.
+   * Generate a new identity.
    */
-  async create(): Promise<GenerateIdentityResult> {
+  async generate(): Promise<GenerateIdentityResult> {
     const identity = await this.keyManager.generateIdentity();
     await this.data.putNamedJSON(
       {
@@ -34,6 +33,16 @@ export class Identity {
       identity.address.value,
     );
     return identity;
+  }
+
+  /**
+   * Forget an imported identity.
+   * @param {string} address The address string of the identity.
+   * @returns {Promise<void>} A Promise that resolves on success.
+   */
+  async forget(address: string): Promise<void> {
+    await this.keyManager.forgetIdentity(address);
+    this.emitChange();
   }
 
   /**

@@ -166,6 +166,10 @@ export class Worker /*<PrivateKeyType, PublicKeyType, SessionKeyType>*/ {
   //     };
   //   }, job);
 
+  private forgetIdentity(job: Job<'forgetIdentity'>): Promise<CompletedJob<'forgetIdentity'>> {
+    throw this.errorResponse('Not implemented.', job);
+  }
+
   private generateIdentity(
     job: Job<'generateIdentity'>,
   ): Promise<CompletedJob<'generateIdentity'>> {

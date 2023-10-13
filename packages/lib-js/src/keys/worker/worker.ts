@@ -34,6 +34,8 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
 
   const result = await (() => {
     switch (event.data.action) {
+      case 'forgetIdentity':
+        return forgetIdentity(event.data);
       case 'generateIdentity':
         return generateIdentity();
       case 'importIdentity':
@@ -81,6 +83,15 @@ async function generateAddress(
 }
 
 // Job handler functions
+
+function forgetIdentity(job: Job<'forgetIdentity'>): void {
+  const foundIndex = importedIdentities.findIndex(
+    (value) => value.address.value === job.payload.address,
+  );
+  if (foundIndex > -1) {
+    importedIdentities.splice(foundIndex, 1);
+  }
+}
 
 async function generateIdentity(): Promise<GenerateIdentityResult> {
   const encryptionKeyPair = nacl.box.keyPair();

@@ -1,3 +1,4 @@
+import { KeyManagerActionError } from '../../shared/errors/key-manager-action.error';
 import type * as Payload from '../../shared/interfaces/payloads';
 import type { Action, Request, Result } from '../../shared/types';
 import { ManagedWorker } from './managed-worker';
@@ -5,7 +6,7 @@ import { ManagedWorker } from './managed-worker';
 export class KeyManager {
   private readonly cluster: ManagedWorker[];
 
-  private readonly _importedKeys = new Array<string>();
+  private readonly _importedAddresses = new Array<string>();
 
   private currentWorker = 0;
 
@@ -17,8 +18,8 @@ export class KeyManager {
     );
   }
 
-  get importedKeys() {
-    return structuredClone(this._importedKeys);
+  get importedAddresses() {
+    return structuredClone(this._importedAddresses);
   }
 
   private getNextWorker(): number {
@@ -64,6 +65,17 @@ export class KeyManager {
   //   return (await this.postToOne({ action: 'exportSession' })).payload;
   // }
 
+  async forgetIdentity(address: string): Promise<void> {
+    await this.postToAll({
+      action: 'forgetIdentity',
+      payload: { address },
+    });
+    const foundIndex = this._importedAddresses.findIndex((value) => value === address);
+    if (foundIndex > -1) {
+      this._importedAddresses.splice(foundIndex, 1);
+    }
+  }
+
   async generateIdentity(): Promise<Payload.GenerateIdentityResult> {
     return (await this.postToOne({ action: 'generateIdentity' })).payload;
   }
@@ -91,15 +103,19 @@ export class KeyManager {
   // }
 
   async importIdentity(address: string, secret: Uint8Array): Promise<void> {
-    await this.postToAll({
+    const results = await this.postToAll({
       action: 'importIdentity',
       payload: {
         address,
         secret,
       },
     });
-    // TODO: forgetIdentity job to roll back on error, ensure cluster is in sync
-    this._importedKeys.push(address);
+    const failedResult = results.find((result) => !result.ok);
+    if (failedResult) {
+      await this.forgetIdentity(address);
+      throw new KeyManagerActionError('importIdentity', failedResult.error ?? 'Unknown error.');
+    }
+    this._importedAddresses.push(address);
   }
 
   // async importSession<T extends boolean>(

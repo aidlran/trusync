@@ -103,6 +103,12 @@ export class KeyManager {
   // }
 
   async importIdentity(address: string, secret: Uint8Array): Promise<void> {
+    if (this._importedAddresses.find((importedAddress) => importedAddress === address)) {
+      throw new KeyManagerActionError(
+        'importIdentity',
+        `Address '${address}' is already imported.`,
+      );
+    }
     const results = await this.postToAll({
       action: 'importIdentity',
       payload: {

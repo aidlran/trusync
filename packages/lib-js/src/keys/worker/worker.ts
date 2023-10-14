@@ -116,6 +116,10 @@ async function generateIdentity(): Promise<GenerateIdentityResult> {
 }
 
 async function importIdentity(job: Job<'importIdentity'>): Promise<void> {
+  if (importedIdentities.find((identity) => identity.address.value === job.payload.address)) {
+    throw errorResponse(`Address '${job.payload.address}' is already imported.`);
+  }
+
   const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(job.payload.secret);
   const signingKeyPair = nacl.sign.keyPair.fromSeed(job.payload.secret);
   const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);

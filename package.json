@@ -11,9 +11,13 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces",
+    "build:js": "npm run build -w packages/lib-js",
+    "build:svelte": "npm run build -w packages/lib-svelte",
     "format": "prettier --write --plugin prettier-plugin-svelte .",
     "lc": "npm run lc --workspaces",
     "lint": "eslint .",
+    "lint:js": "eslint packages/lib-js",
+    "lint:svelte": "eslint packages/lib-svelte",
     "start": "conc -kn js,svelte \"npm start -w packages/lib-js\" \"npm start -w packages/lib-svelte\""
   },
   "devDependencies": {

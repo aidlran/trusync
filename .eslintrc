@@ -11,7 +11,7 @@
   "plugins": ["deprecation"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": "latest",
     "extraFileExtensions": [".svelte"],
     "sourceType": "module",
     "project": "tsconfig.json"

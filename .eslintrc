@@ -28,6 +28,9 @@
     }
   ],
   "rules": {
-    "deprecation/deprecation": "warn"
+    "@typescript-eslint/array-type": "off",
+    "deprecation/deprecation": "warn",
+    "no-console": "error",
+    "no-debugger": "error"
   }
 }

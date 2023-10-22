@@ -1,6 +1,6 @@
 import type { Data } from '../data/data';
 import type { KeyManager } from '../keys/primary/classes/key-manager';
-import type { GenerateIdentityResult } from '../keys/shared';
+import type { GenerateIdentityResult, GetSessionsResult } from '../keys/shared';
 
 export class Identity {
   onChange?: (identity: Identity) => void;
@@ -9,6 +9,10 @@ export class Identity {
     private readonly data: Data,
     private readonly keyManager: KeyManager,
   ) {}
+
+  get activeSession(): number | undefined {
+    return this.keyManager.activeSession;
+  }
 
   get importedAddresses(): string[] {
     return this.keyManager.importedAddresses;
@@ -45,6 +49,10 @@ export class Identity {
     this.emitChange();
   }
 
+  getSessions<T>(): Promise<GetSessionsResult> {
+    return this.keyManager.getSessions<T>();
+  }
+
   /**
    * Import an existing identity.
    * @param {string} address The address string of the identity.
@@ -53,6 +61,16 @@ export class Identity {
    */
   async import(address: string, secret: Uint8Array): Promise<void> {
     await this.keyManager.importIdentity(address, secret);
+    this.emitChange();
+  }
+
+  async initSession<T>(password: string, metadata?: T): Promise<void> {
+    await this.keyManager.initSession(password, metadata);
+    this.emitChange();
+  }
+
+  async useSession(sessionID: number, password: string): Promise<void> {
+    await this.keyManager.useSession(sessionID, password);
     this.emitChange();
   }
 }

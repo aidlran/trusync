@@ -6,64 +6,41 @@ import { ManagedWorker } from './managed-worker';
 export class KeyManager {
   private readonly cluster: ManagedWorker[];
 
+  // TODO: use a set
   private readonly _importedAddresses = new Array<string>();
 
-  private currentWorker = 0;
+  private _activeSession: number | undefined;
+  private currentWorkerIndex = 0;
 
   constructor(workerConstructor: () => Worker) {
     this.cluster = Array.from(
       // TODO: test this on Safari
-      { length: Math.ceil(navigator.hardwareConcurrency / 2) },
+      { length: Math.min(Math.max(Math.floor(navigator.hardwareConcurrency / 2), 1), 4) },
       () => new ManagedWorker(workerConstructor),
     );
   }
 
-  get importedAddresses() {
+  get activeSession(): number | undefined {
+    return this._activeSession;
+  }
+
+  get importedAddresses(): string[] {
     return structuredClone(this._importedAddresses);
   }
 
-  private getNextWorker(): number {
-    // TODO: implement load balancing
-    if (++this.currentWorker >= this.cluster.length) {
-      return (this.currentWorker = 0);
-    } else {
-      return this.currentWorker;
-    }
-  }
-
+  // TODO: further restrict T to specific actions
   private postToOne<T extends Action>(request: Request<T>): Promise<Result<T>> {
-    return this.cluster[this.getNextWorker()].postJob(request);
+    // TODO: load balancing
+    if (++this.currentWorkerIndex >= this.cluster.length) {
+      this.currentWorkerIndex = 0;
+    }
+    return this.cluster[this.currentWorkerIndex].postJob(request);
   }
 
+  // TODO: further restrict T to specific actions
   private postToAll<T extends Action>(request: Request<T>): Promise<Result<T>[]> {
     return Promise.all(this.cluster.map((worker) => worker.postJob(request)));
   }
-
-  // async asymmetricDecrypt(payload: Payload.AsymmetricCryptPayload): Promise<Payload.CryptResult> {
-  //   return (await this.postToOne({ action: 'asymmetricDecrypt', payload })).payload;
-  // }
-
-  // async asymmetricEncrypt(
-  //   payload: Payload.AsymmetricCryptPayload,
-  // ): Promise<Payload.AsymmetricCryptPayload> {
-  //   return (await this.postToOne({ action: 'asymmetricEncrypt', payload })).payload;
-  // }
-
-  // // TODO: review types
-  // destroySession() {
-  //   this._importedKeys.length = 0;
-  //   return this.postToAll({ action: 'destroySession' });
-  // }
-
-  // async encryptPrivateKey(
-  //   payload: Payload.EncryptPrivateKeyRequest,
-  // ): Promise<Payload.EncryptPrivateKeyResult> {
-  //   return (await this.postToOne({ action: 'encryptPrivateKey', payload })).payload;
-  // }
-
-  // async exportSession(): Promise<Payload.ExportSessionResult> {
-  //   return (await this.postToOne({ action: 'exportSession' })).payload;
-  // }
 
   async forgetIdentity(address: string): Promise<void> {
     await this.postToAll({
@@ -80,27 +57,11 @@ export class KeyManager {
     return (await this.postToOne({ action: 'generateIdentity' })).payload;
   }
 
-  // async generateKeyPair(
-  //   payload?: Payload.GenerateKeyPairRequest,
-  // ): Promise<Payload.GenerateKeyPairResult> {
-  //   return (await this.postToOne({ action: 'generateKeyPair', payload })).payload;
-  // }
-
-  // async hybridDecrypt(payload: Payload.HybridDecryptRequest): Promise<Payload.CryptResult> {
-  //   return (await this.postToOne({ action: 'hybridDecrypt', payload })).payload;
-  // }
-
-  // async hybridEncrypt(
-  //   payload: Payload.AsymmetricCryptPayload,
-  // ): Promise<Payload.HybridEncryptResult> {
-  //   return (await this.postToOne({ action: 'hybridEncrypt', payload })).payload;
-  // }
-
-  // async hybridShareKey(
-  //   payload: Payload.HybridShareKeyRequest,
-  // ): Promise<Payload.AsymmetricCryptPayload> {
-  //   return (await this.postToOne({ action: 'hybridShareKey', payload })).payload;
-  // }
+  async getSessions<T>(): Promise<Payload.GetSessionsResult<T>> {
+    // TODO: this can be done on main thread. Measure latency to see if it's better done here.
+    return (await this.postToOne({ action: 'getSessions' }))
+      .payload as Payload.GetSessionsResult<T>;
+  }
 
   async importIdentity(address: string, secret: Uint8Array): Promise<void> {
     if (this._importedAddresses.find((importedAddress) => importedAddress === address)) {
@@ -124,33 +85,76 @@ export class KeyManager {
     this._importedAddresses.push(address);
   }
 
-  // async importSession<T extends boolean>(
-  //   request: Payload.ImportSessionRequest<T>,
-  // ): Promise<Payload.ImportSessionResult<T>> {
-  //   const [{ payload }] = await this.postToAll({
-  //     action: 'importSession',
-  //     payload: { ...request, reexport: false },
-  //   });
+  async initSession<T>(pin: string, metadata?: T): Promise<void> {
+    const initResult = await this.postToOne({
+      action: 'initSession',
+      payload: {
+        pin,
+        metadata,
+      },
+    });
 
-  //   this._importedKeys.push(...payload.importedKeyIDs);
+    await this.useSession(initResult.payload.sessionID, pin);
+  }
 
-  //   if (request.reexport) {
-  //     // TODO: scrap this, or do within worker
-  //     return {
-  //       ...payload,
-  //       ...(await this.exportSession()),
-  //       reexported: true,
-  //     } as Payload.ImportSessionResult<T>;
-  //   } else {
-  //     return payload as Payload.ImportSessionResult<T>;
-  //   }
-  // }
+  async useSession(sessionID: number, pin: string): Promise<void> {
+    const results = await this.postToAll({
+      action: 'useSession',
+      payload: {
+        sessionID,
+        pin,
+      },
+    });
 
-  // async symmetricDecrypt(payload: Payload.SymmetricCryptPayload): Promise<Payload.CryptResult> {
-  //   return (await this.postToOne({ action: 'symmetricDecrypt', payload })).payload;
-  // }
+    // We need to check result from all workers and ensure they are in sync
+    // If one or more of them borked it, roll it back!
 
-  // async symmetricEncrypt(payload: Payload.SymmetricCryptPayload): Promise<Payload.CryptResult> {
-  //   return (await this.postToOne({ action: 'symmetricEncrypt', payload })).payload;
-  // }
+    let allImportedAddresses!: Set<string>;
+    let firstRun = true;
+    let ok = true;
+
+    for (const result of results) {
+      const iterationImportedAddresses = new Set<string>(result.payload.importedAddresses);
+
+      if (!result.ok) {
+        ok = false;
+      }
+
+      if (firstRun) {
+        allImportedAddresses = iterationImportedAddresses;
+      } else {
+        if (ok) {
+          ok = allImportedAddresses.size === iterationImportedAddresses.size;
+        }
+
+        if (ok) {
+          for (const address of iterationImportedAddresses) {
+            ok = allImportedAddresses.has(address as string);
+            if (!ok) break;
+          }
+        }
+
+        if (!ok) {
+          for (const address of iterationImportedAddresses) {
+            allImportedAddresses.add(address as string);
+          }
+        }
+      }
+
+      firstRun = false;
+    }
+
+    if (ok) {
+      this._importedAddresses.length = 0;
+      for (const address of allImportedAddresses) {
+        this._importedAddresses.push(address as string);
+      }
+      this._activeSession = sessionID;
+    } else {
+      await Promise.all(
+        [...allImportedAddresses].map((address: string) => this.forgetIdentity(address)),
+      );
+      throw new KeyManagerActionError('useSession', 'One or more workers were out of sync.');
+    }
+  }
 }

@@ -21,9 +21,6 @@
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
-    "@openpgp/web-stream-tools": "^0.0.14",
-    "jose": "^4.15.2",
-    "openpgp": "^5.9.0",
-    "typescript": "^5.1.0"
+    "typescript": "~5.2.2"
   }
 }

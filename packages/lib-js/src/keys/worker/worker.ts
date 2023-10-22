@@ -1,9 +1,15 @@
 import * as nacl from 'tweetnacl';
-import { concatenateByteArray } from '../../crypto/common/buffer-utils';
-import { sha256 } from '../../crypto/hash/sha256';
-import { base58 } from '../../crypto/encode/base';
-import { type GenerateIdentityResult, KeyManagerActionError, KeyManagerError } from '../shared';
+import { generateAddress } from '../../crypto/address';
+import {
+  type GenerateIdentityResult,
+  type GetSessionsResult,
+  type InitSessionResult,
+  type UseSessionResult,
+  KeyManagerActionError,
+  KeyManagerError,
+} from '../shared';
 import type { Action, Job } from '../shared/types';
+import { create, get, getAll, put } from './indexeddb';
 
 interface Address {
   value: string;
@@ -23,7 +29,34 @@ interface Identity {
   sign: KeyPair;
 }
 
+interface Serialised {
+  identities: Array<{
+    address: string;
+    secret: Uint8Array;
+    types: {
+      address: number;
+      encrypt: number;
+      sign: number;
+    };
+  }>;
+}
+
+interface LiveSession {
+  id: IDBValidKey;
+  secretKey: CryptoKey;
+  metadata?: unknown;
+}
+
+interface SymmetricEncryptData {
+  salt: Uint8Array;
+  nonce: Uint8Array;
+  payload: Uint8Array;
+}
+
+const encoder = new TextEncoder();
 const importedIdentities = new Array<Identity>();
+
+let session: LiveSession | undefined;
 
 self.onmessage = async (event: MessageEvent<Job<Action>>) => {
   const { action, jobID } = event.data;
@@ -32,26 +65,46 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
     throw errorResponse('No action was provided.', action, jobID);
   }
 
-  const result = await (() => {
-    switch (event.data.action) {
-      case 'forgetIdentity':
-        return forgetIdentity(event.data);
-      case 'generateIdentity':
-        return generateIdentity();
-      case 'importIdentity':
-        return importIdentity(event.data);
-      default:
-        throw errorResponse('This action is not supported.', action, jobID);
-    }
-  })();
+  try {
+    const result = await (() => {
+      switch (event.data.action) {
+        case 'forgetIdentity':
+          return forgetIdentity(event.data);
+        case 'generateIdentity':
+          return generateIdentity();
+        case 'getSessions':
+          return getSessions();
+        case 'importIdentity':
+          return importIdentity(event.data);
+        case 'initSession':
+          return initSession(event.data);
+        case 'saveSession':
+          return saveSession(event.data);
+        case 'useSession':
+          return useSession(event.data);
+        default:
+          throw errorResponse('This action is not supported.', action, jobID);
+      }
+    })();
 
-  self.postMessage({
-    action,
-    jobID,
-    ok: true,
-    payload: result,
-  });
+    self.postMessage({
+      action,
+      jobID,
+      ok: true,
+      payload: result,
+    });
+  } catch (error) {
+    self.postMessage({
+      action,
+      error: 'Unknown error',
+      jobID,
+      ok: false,
+    });
+    throw error;
+  }
 };
+
+self.postMessage({ action: 'workerReady' });
 
 function errorResponse(error: string, action?: Action, jobID?: number): KeyManagerError {
   self.postMessage({
@@ -70,19 +123,45 @@ function errorResponse(error: string, action?: Action, jobID?: number): KeyManag
 
 // Utility functions
 
-// TODO: move to crypto module
-async function generateAddress(
-  publicEncryptionKey: Uint8Array,
-  publicSigningKey: Uint8Array,
-): Promise<string> {
-  const addressByteArray = concatenateByteArray(publicEncryptionKey, publicSigningKey);
-  const addressHash = await sha256(addressByteArray);
-  const addressEncoded = base58.encode(addressHash);
-
-  return addressEncoded;
+async function encryptSession(secretKey: CryptoKey): Promise<SymmetricEncryptData> {
+  const jsonPayload: Serialised = {
+    identities: importedIdentities.map((identity) => ({
+      address: identity.address.value,
+      secret: identity.secret,
+      types: {
+        address: identity.address.type,
+        encrypt: identity.encrypt.type,
+        sign: identity.sign.type,
+      },
+    })),
+  };
+  // TODO: move crypto functions to `src/crypto`
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const encryptionKey = new Uint8Array(
+    await crypto.subtle.deriveBits(
+      {
+        name: 'PBKDF2',
+        hash: 'SHA-256',
+        iterations: 100000,
+        salt,
+      },
+      secretKey,
+      256,
+    ),
+  );
+  const nonce = crypto.getRandomValues(new Uint8Array(nacl.secretbox.nonceLength));
+  const messageBytes = encoder.encode(JSON.stringify(jsonPayload));
+  // TODO: replace with WebCrypto implementation
+  const payload = nacl.secretbox(messageBytes, nonce, encryptionKey);
+  return {
+    salt,
+    nonce,
+    payload,
+  };
 }
 
 // Job handler functions
+// TODO: move to individual files
 
 function forgetIdentity(job: Job<'forgetIdentity'>): void {
   const foundIndex = importedIdentities.findIndex(
@@ -94,15 +173,14 @@ function forgetIdentity(job: Job<'forgetIdentity'>): void {
 }
 
 async function generateIdentity(): Promise<GenerateIdentityResult> {
+  // TODO: move crypto functions to `src/crypto`
+  // TODO: replace with WebCrypto implementation
   const encryptionKeyPair = nacl.box.keyPair();
   const signingKeyPair = nacl.sign.keyPair.fromSeed(encryptionKeyPair.secretKey);
   const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);
 
   return {
-    address: {
-      value: address,
-      type: 0,
-    },
+    address,
     encryption: {
       publicKey: encryptionKeyPair.publicKey,
       type: 0,
@@ -115,24 +193,32 @@ async function generateIdentity(): Promise<GenerateIdentityResult> {
   };
 }
 
+function getSessions(): Promise<GetSessionsResult> {
+  return getAll('session').then((sessions) =>
+    sessions.map((v) => ({
+      id: v.id as number,
+      metadata: v.metadata,
+    })),
+  );
+}
+
 async function importIdentity(job: Job<'importIdentity'>): Promise<void> {
   if (importedIdentities.find((identity) => identity.address.value === job.payload.address)) {
     throw errorResponse(`Address '${job.payload.address}' is already imported.`);
   }
 
+  // TODO: move crypto functions to `src/crypto`
+  // TODO: replace with WebCrypto implementation
   const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(job.payload.secret);
   const signingKeyPair = nacl.sign.keyPair.fromSeed(job.payload.secret);
   const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);
 
-  if (address !== job.payload.address) {
-    throw errorResponse('Invalid secret');
+  if (address.value !== job.payload.address) {
+    throw errorResponse('Invalid secret', job.action, job.jobID);
   }
 
   importedIdentities.push({
-    address: {
-      value: address,
-      type: 0,
-    },
+    address,
     secret: job.payload.secret,
     encrypt: {
       publicKey: encryptionKeyPair.publicKey,
@@ -145,4 +231,133 @@ async function importIdentity(job: Job<'importIdentity'>): Promise<void> {
       type: 0,
     },
   });
+}
+
+async function initSession(job: Job<'initSession'>): Promise<InitSessionResult> {
+  // TODO: move crypto functions to `src/crypto`
+  const secretKey = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(job.payload.pin),
+    'PBKDF2',
+    false,
+    ['deriveBits'],
+  );
+  const { salt, nonce, payload } = await encryptSession(secretKey);
+  const id = await create('session', {
+    salt,
+    nonce,
+    payload,
+    metadata: job.payload.metadata,
+  });
+  session = {
+    id,
+    secretKey,
+    metadata: job.payload.metadata,
+  };
+  return {
+    sessionID: id as number,
+  };
+}
+
+async function saveSession(job: Job<'saveSession'>): Promise<void> {
+  if (!session) {
+    throw errorResponse(
+      'No session active. `initSession` or `useSession` must be called first.',
+      job.action,
+      job.jobID,
+    );
+  }
+  const { salt, nonce, payload } = await encryptSession(session.secretKey);
+  await put('session', {
+    id: session.id,
+    salt,
+    nonce,
+    payload,
+    metadata: session.metadata,
+  });
+}
+
+async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
+  const { id, salt, nonce, payload, metadata } = await get('session', job.payload.sessionID).catch(
+    () => {
+      throw errorResponse('Could not get session.', job.action, job.jobID);
+    },
+  );
+
+  // TODO: move crypto functions to `src/crypto`
+
+  const secretKey = await crypto.subtle.importKey(
+    'raw',
+    encoder.encode(job.payload.pin),
+    'PBKDF2',
+    false,
+    ['deriveBits'],
+  );
+
+  const encryptionKey = await crypto.subtle.deriveBits(
+    {
+      name: 'PBKDF2',
+      hash: 'SHA-256',
+      iterations: 100000,
+      salt,
+    },
+    secretKey,
+    256,
+  );
+
+  const message = nacl.secretbox.open(
+    new Uint8Array(payload),
+    new Uint8Array(nonce),
+    new Uint8Array(encryptionKey),
+  );
+
+  if (!message) {
+    throw errorResponse('Invalid pin.', job.action, job.jobID);
+  }
+
+  const serialised = JSON.parse(new TextDecoder().decode(message)) as Serialised;
+  const importedAddresses = new Array<string>();
+
+  importedIdentities.length = 0;
+  importedIdentities.push(
+    ...(await Promise.all(
+      serialised.identities.map(async (identity) => {
+        const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(identity.secret);
+        const signingKeyPair = nacl.sign.keyPair.fromSeed(identity.secret);
+        const address = await generateAddress(
+          encryptionKeyPair.publicKey,
+          signingKeyPair.publicKey,
+        );
+
+        if (address.value !== identity.address) {
+          throw errorResponse('Invalid secret', job.action, job.jobID);
+        }
+
+        importedAddresses.push(address.value);
+
+        return {
+          address,
+          secret: identity.secret,
+          encrypt: {
+            publicKey: encryptionKeyPair.publicKey,
+            secretKey: encryptionKeyPair.secretKey,
+            type: 0,
+          },
+          sign: {
+            publicKey: signingKeyPair.publicKey,
+            secretKey: signingKeyPair.secretKey,
+            type: 0,
+          },
+        };
+      }),
+    )),
+  );
+
+  session = {
+    id,
+    secretKey,
+    metadata,
+  };
+
+  return { importedAddresses };
 }

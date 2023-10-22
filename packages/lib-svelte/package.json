@@ -41,7 +41,7 @@
   "devDependencies": {
     "@playwright/test": "^1.37.0",
     "@sveltejs/adapter-auto": "^2.1.0",
-    "@sveltejs/kit": "^1.0.0",
+    "@sveltejs/kit": "^1.26.0",
     "@sveltejs/package": "^2.2.1",
     "concurrently": "^8.2.0",
     "publint": "^0.2.0",
@@ -49,7 +49,7 @@
     "svelte-check": "^3.5.0",
     "trusync": "file:../lib-js",
     "tslib": "^2.6.1",
-    "typescript": "^5.1.6",
+    "typescript": "~5.2.2",
     "vite": "^4.4.9",
     "vitest": "^0.34.1"
   },

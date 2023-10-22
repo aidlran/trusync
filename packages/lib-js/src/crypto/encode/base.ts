@@ -1,4 +1,4 @@
-import * as base from 'base-x';
+import base from 'base-x';
 import { encodeByteArrayString } from '../common/buffer-utils';
 
 export const base58 = base('123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz');

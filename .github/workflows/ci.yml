@@ -14,47 +14,59 @@ on:
 
 jobs:
   js-build:
-    name: JS / Build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [ 14, 16, 18 ]
+    name: JS / Build / Node v${{ matrix.node-version }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
       - run: npm ci
       - run: npm run build:js
 
   js-lint:
-    name: JS / Lint
     runs-on: ubuntu-latest
+    name: JS / Lint
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: 'npm'
       - run: npm ci
       - run: npm run lint:js
 
   svelte-build:
-    name: Svelte / Build
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [ 14, 16, 18 ]
+    name: Svelte / Build / Node v${{ matrix.node-version }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: ${{ matrix.node }}
+          cache: 'npm'
       - run: npm ci
       - run: npm run build:js
       - run: npm run build:svelte
 
   svelte-lint:
-    name: Svelte / Lint
     runs-on: ubuntu-latest
+    name: Svelte / Lint
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: 'npm'
       - run: npm ci
       - run: npm run build:js
       - run: npm run lint:svelte

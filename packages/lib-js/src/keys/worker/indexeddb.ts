@@ -116,7 +116,7 @@ export function put<T extends ObjectStoreName>(
         const request = database
           .transaction(objectStoreName, 'readwrite')
           .objectStore(objectStoreName)
-          .put(value, value.id);
+          .put(value);
 
         request.onerror = () => {
           reject(request.error ?? new Error());

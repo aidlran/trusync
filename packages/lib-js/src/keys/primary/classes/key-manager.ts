@@ -83,6 +83,9 @@ export class KeyManager {
       throw new KeyManagerActionError('importIdentity', failedResult.error ?? 'Unknown error.');
     }
     this._importedAddresses.push(address);
+    if (this.activeSession) {
+      await this.postToOne({ action: 'saveSession' });
+    }
   }
 
   async initSession<T>(pin: string, metadata?: T): Promise<void> {

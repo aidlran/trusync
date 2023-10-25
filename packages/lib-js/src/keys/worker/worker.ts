@@ -11,6 +11,8 @@ import {
 import type { Action, Job } from '../shared/types';
 import { create, get, getAll, put } from './indexeddb';
 
+// TODO: move and optimise these interfaces
+
 interface Address {
   value: string;
   type: number;
@@ -29,10 +31,12 @@ interface Identity {
   sign: KeyPair;
 }
 
-interface Serialised {
+// TODO: indexeddb is transforming the Uint8Array to Record
+// make an indexeddb session repository that handles the conversion
+interface SerialisedSession<T extends Iterable<number> | Record<number, number>> {
   identities: Array<{
     address: string;
-    secret: Uint8Array;
+    secret: T;
     types: {
       address: number;
       encrypt: number;
@@ -124,7 +128,7 @@ function errorResponse(error: string, action?: Action, jobID?: number): KeyManag
 // Utility functions
 
 async function encryptSession(secretKey: CryptoKey): Promise<SymmetricEncryptData> {
-  const jsonPayload: Serialised = {
+  const jsonPayload: SerialisedSession<Iterable<number>> = {
     identities: importedIdentities.map((identity) => ({
       address: identity.address.value,
       secret: identity.secret,
@@ -315,15 +319,18 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
     throw errorResponse('Invalid pin.', job.action, job.jobID);
   }
 
-  const serialised = JSON.parse(new TextDecoder().decode(message)) as Serialised;
+  const serialised = JSON.parse(new TextDecoder().decode(message)) as SerialisedSession<
+    Record<number, number>
+  >;
   const importedAddresses = new Array<string>();
 
   importedIdentities.length = 0;
   importedIdentities.push(
     ...(await Promise.all(
       serialised.identities.map(async (identity) => {
-        const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(identity.secret);
-        const signingKeyPair = nacl.sign.keyPair.fromSeed(identity.secret);
+        const secret = new Uint8Array(Object.values(identity.secret));
+        const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(secret);
+        const signingKeyPair = nacl.sign.keyPair.fromSeed(secret);
         const address = await generateAddress(
           encryptionKeyPair.publicKey,
           signingKeyPair.publicKey,
@@ -337,7 +344,7 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
 
         return {
           address,
-          secret: identity.secret,
+          secret,
           encrypt: {
             publicKey: encryptionKeyPair.publicKey,
             secretKey: encryptionKeyPair.secretKey,

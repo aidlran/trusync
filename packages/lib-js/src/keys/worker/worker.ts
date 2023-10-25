@@ -82,6 +82,8 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
           return importIdentity(event.data);
         case 'initSession':
           return initSession(event.data);
+        case 'reset':
+          return reset();
         case 'saveSession':
           return saveSession(event.data);
         case 'useSession':
@@ -261,6 +263,11 @@ async function initSession(job: Job<'initSession'>): Promise<InitSessionResult> 
   return {
     sessionID: id as number,
   };
+}
+
+function reset(): void {
+  importedIdentities.length = 0;
+  session = undefined;
 }
 
 async function saveSession(job: Job<'saveSession'>): Promise<void> {

@@ -9,6 +9,7 @@ export type RequestPayload =
   // Have no payload
   | ActionMixin<'generateIdentity'>
   | ActionMixin<'getSessions'>
+  | ActionMixin<'reset'>
   | ActionMixin<'saveSession'>
   // Have a payload
   | Payload<'forgetIdentity', Payloads.ForgetIdentityRequest>

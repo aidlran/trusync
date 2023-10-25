@@ -29,6 +29,7 @@
   ],
   "rules": {
     "@typescript-eslint/array-type": "off",
+    "@typescript-eslint/switch-exhaustiveness-check": "error",
     "deprecation/deprecation": "warn",
     "no-console": "error",
     "no-debugger": "error"

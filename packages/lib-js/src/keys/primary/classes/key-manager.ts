@@ -100,6 +100,12 @@ export class KeyManager {
     await this.useSession(initResult.payload.sessionID, pin);
   }
 
+  async reset(): Promise<void> {
+    await this.postToAll({ action: 'reset' });
+    this._importedAddresses.length = 0;
+    this._activeSession = undefined;
+  }
+
   async useSession(sessionID: number, pin: string): Promise<void> {
     const results = await this.postToAll({
       action: 'useSession',

@@ -4,6 +4,7 @@ export type Action =
   | 'getSessions'
   | 'importIdentity'
   | 'initSession'
+  | 'reset'
   | 'saveSession'
   | 'useSession'
   | 'workerReady';

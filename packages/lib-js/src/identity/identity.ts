@@ -69,6 +69,11 @@ export class Identity {
     this.emitChange();
   }
 
+  async reset(): Promise<void> {
+    await this.keyManager.reset();
+    this.emitChange();
+  }
+
   async useSession(sessionID: number, password: string): Promise<void> {
     await this.keyManager.useSession(sessionID, password);
     this.emitChange();

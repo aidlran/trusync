@@ -7,7 +7,7 @@ import type { Payload } from './payload';
  */
 export type ResultPayload =
   // Have no payload
-  | ActionMixin<'forgetIdentity' | 'importIdentity' | 'saveSession' | 'workerReady'>
+  | ActionMixin<'forgetIdentity' | 'importIdentity' | 'reset' | 'saveSession' | 'workerReady'>
   // Have a payload
   | Payload<'generateIdentity', Payloads.GenerateIdentityResult>
   | Payload<'getSessions', Payloads.GetSessionsResult>

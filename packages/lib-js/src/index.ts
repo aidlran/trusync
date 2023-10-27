@@ -1,25 +1,22 @@
-import { TrusyncApp } from './app/trusync-app';
-import { Data } from './data/data';
-import { Identity } from './identity/identity';
-import { KeyManager } from './keys/primary/classes/key-manager';
-import type { StorageDriver } from './storage/interfaces/storage-driver';
+import { TrusyncApp } from './app/trusync-app.js';
+import { createWorker } from './create-worker.js';
+import { Data } from './data/data.js';
+import { Identity } from './identity/identity.js';
+import { KeyManager } from './keys/primary/classes/key-manager.js';
+import type { Channel } from './data/channel/channel.js';
 
-export * from './crypto';
-export type { GenerateIdentityResult, GetSessionsResult } from './keys/shared';
-export * from './storage';
-export type { Data, Identity, TrusyncApp };
+export type { Channel, Data, Identity, TrusyncApp };
 
-function createWorker() {
-  return new Worker(new URL('./keys/worker/worker.js?worker', import.meta.url), {
-    type: 'module',
-  });
-}
+export * from './crypto/index.js';
+export type { GenerateIdentityResult } from './keys/shared/index.js';
+export * from './session/session.js';
+export * from './storage/interfaces/index.js';
 
 export function trusyncApp() {
-  const storageDrivers = new Array<StorageDriver>();
-  const data = new Data(storageDrivers);
+  const channels = new Array<Channel>();
+  const data = new Data(channels);
   const keyManager = new KeyManager(createWorker);
   const identity = new Identity(data, keyManager);
-  const app = new TrusyncApp(storageDrivers, data, identity);
+  const app = new TrusyncApp(channels, data, identity);
   return app;
 }

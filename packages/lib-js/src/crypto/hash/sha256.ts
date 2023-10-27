@@ -1,4 +1,4 @@
-import { toBufferSource } from '../common/buffer-utils';
+import { toBufferSource } from '../common/buffer-utils.js';
 
 export async function sha256(payload: string | BufferSource): Promise<Uint8Array> {
   const byteArray = toBufferSource(payload);

@@ -1,6 +1,6 @@
-import { concatenateByteArray } from './common/buffer-utils';
-import { base58 } from './encode/base';
-import { sha256 } from './hash/sha256';
+import { concatenateByteArray } from './common/buffer-utils.js';
+import { base58 } from './encode/base.js';
+import { sha256 } from './hash/sha256.js';
 
 export interface Address {
   type: AddressType;

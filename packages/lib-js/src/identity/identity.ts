@@ -1,6 +1,6 @@
-import type { Data } from '../data/data';
-import type { KeyManager } from '../keys/primary/classes/key-manager';
-import type { GenerateIdentityResult, GetSessionsResult } from '../keys/shared';
+import type { Data } from '../data/data.js';
+import type { KeyManager } from '../keys/primary/classes/key-manager.js';
+import type { GenerateIdentityResult } from '../keys/shared/interfaces/payloads/results/generate-identity-result.js';
 
 export class Identity {
   onChange?: (identity: Identity) => void;
@@ -24,9 +24,7 @@ export class Identity {
     }
   }
 
-  /**
-   * Generate a new identity.
-   */
+  /** Generate a new identity. */
   async generate(): Promise<GenerateIdentityResult> {
     const identity = await this.keyManager.generateIdentity();
     await this.data.putNamedJSON(
@@ -41,6 +39,7 @@ export class Identity {
 
   /**
    * Forget an imported identity.
+   *
    * @param {string} address The address string of the identity.
    * @returns {Promise<void>} A Promise that resolves on success.
    */
@@ -49,12 +48,9 @@ export class Identity {
     this.emitChange();
   }
 
-  getSessions<T>(): Promise<GetSessionsResult> {
-    return this.keyManager.getSessions<T>();
-  }
-
   /**
    * Import an existing identity.
+   *
    * @param {string} address The address string of the identity.
    * @param {Uint8Array} secret The secret key of the identity as raw bytes.
    * @returns {Promise<void>} A Promise that resolves on success.

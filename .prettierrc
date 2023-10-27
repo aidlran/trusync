@@ -1,5 +1,8 @@
 {
-  "plugins": ["prettier-plugin-svelte"],
+  "plugins": ["./node_modules/prettier-plugin-jsdoc/dist/index.js", "prettier-plugin-svelte"],
+
   "printWidth": 100,
-  "singleQuote": true
+  "singleQuote": true,
+
+  "tsdoc": true
 }

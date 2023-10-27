@@ -1,7 +1,7 @@
-import { KeyManagerActionError } from '../../shared/errors/key-manager-action.error';
-import type * as Payload from '../../shared/interfaces/payloads';
-import type { Action, Request, Result } from '../../shared/types';
-import { ManagedWorker } from './managed-worker';
+import { KeyManagerActionError } from '../../shared/errors/key-manager-action.error.js';
+import type { GenerateIdentityResult } from '../../shared/interfaces/payloads/index.js';
+import type { Action, Request, Result } from '../../shared/types/index.js';
+import { ManagedWorker } from './managed-worker.js';
 
 export class KeyManager {
   private readonly cluster: ManagedWorker[];
@@ -53,14 +53,8 @@ export class KeyManager {
     }
   }
 
-  async generateIdentity(): Promise<Payload.GenerateIdentityResult> {
+  async generateIdentity(): Promise<GenerateIdentityResult> {
     return (await this.postToOne({ action: 'generateIdentity' })).payload;
-  }
-
-  async getSessions<T>(): Promise<Payload.GetSessionsResult<T>> {
-    // TODO: this can be done on main thread. Measure latency to see if it's better done here.
-    return (await this.postToOne({ action: 'getSessions' }))
-      .payload as Payload.GetSessionsResult<T>;
   }
 
   async importIdentity(address: string, secret: Uint8Array): Promise<void> {

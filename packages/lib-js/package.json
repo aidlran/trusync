@@ -11,6 +11,21 @@
   "main": "dist/src/index.js",
   "bin": "dist/bin/trusync.js",
   "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "default": "./dist/src/index.js",
+      "types": "./dist/src/types.d.ts"
+    },
+    "./channel": {
+      "default": "./dist/src/data/channel/index.js",
+      "types": "./dist/src/data/channel/types.d.ts"
+    },
+    "./crypto": {
+      "default": "./dist/src/crypto/index.js",
+      "types": "./dist/src/crypto/types.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "lc": "echo truSync JS: $(find bin src -type f -exec cat {} \\; | wc -l) lines",

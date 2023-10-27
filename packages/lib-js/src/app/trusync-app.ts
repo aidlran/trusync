@@ -1,21 +1,21 @@
-import type { Data } from '../data/data';
-import type { Identity } from '../identity/identity';
-import type { StorageDriver } from '../storage/interfaces/storage-driver';
+import type { Data } from '../data/data.js';
+import type { Identity } from '../identity/identity.js';
+import type { Channel } from '../data/channel/channel.js';
 
 export class TrusyncApp {
   constructor(
-    private readonly _storageDrivers: StorageDriver[],
+    private readonly _channels: Channel[],
     readonly data: Data,
     readonly identity: Identity,
   ) {}
 
-  get storageDrivers(): StorageDriver[] {
+  get channels(): Channel[] {
     // Expose a shallow clone
-    return [...this._storageDrivers];
+    return [...this._channels];
   }
 
-  pushStorageDriver(driver: StorageDriver): TrusyncApp {
-    this._storageDrivers.push(driver);
+  pushChannel(channel: Channel): TrusyncApp {
+    this._channels.push(channel);
     return this;
   }
 }

@@ -1,11 +1,7 @@
 const encoder = new TextEncoder();
 
 export function toBufferSource(input: string | BufferSource): BufferSource {
-  if (typeof input === 'string') {
-    return encoder.encode(input);
-  }
-
-  return input;
+  return typeof input === 'string' ? encoder.encode(input) : input;
 }
 
 export function encodeByteArrayString(input: Uint8Array): string {

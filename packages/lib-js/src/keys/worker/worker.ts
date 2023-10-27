@@ -1,15 +1,14 @@
 import * as nacl from 'tweetnacl';
-import { generateAddress } from '../../crypto/address';
-import {
-  type GenerateIdentityResult,
-  type GetSessionsResult,
-  type InitSessionResult,
-  type UseSessionResult,
-  KeyManagerActionError,
-  KeyManagerError,
-} from '../shared';
-import type { Action, Job } from '../shared/types';
-import { create, get, getAll, put } from './indexeddb';
+import { generateAddress } from '../../crypto/address.js';
+import { KeyManagerError } from '../shared/errors/key-manager.error.js';
+import { KeyManagerActionError } from '../shared/errors/key-manager-action.error.js';
+import type {
+  GenerateIdentityResult,
+  InitSessionResult,
+  UseSessionResult,
+} from '../shared/interfaces/payloads/index.js';
+import type { Action, Job } from '../shared/types/index.js';
+import { create, get, put } from './indexeddb.js';
 
 // TODO: move and optimise these interfaces
 
@@ -76,8 +75,6 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
           return forgetIdentity(event.data);
         case 'generateIdentity':
           return generateIdentity();
-        case 'getSessions':
-          return getSessions();
         case 'importIdentity':
           return importIdentity(event.data);
         case 'initSession':
@@ -197,15 +194,6 @@ async function generateIdentity(): Promise<GenerateIdentityResult> {
       type: 0,
     },
   };
-}
-
-function getSessions(): Promise<GetSessionsResult> {
-  return getAll('session').then((sessions) =>
-    sessions.map((v) => ({
-      id: v.id as number,
-      metadata: v.metadata,
-    })),
-  );
 }
 
 async function importIdentity(job: Job<'importIdentity'>): Promise<void> {

@@ -1,8 +1,10 @@
-import { base64, sha256 } from '../crypto';
-import type { Hash, StorageDriver } from '../storage/interfaces';
+import { base64 } from '../crypto/encode/base.js';
+import { sha256 } from '../crypto/hash/sha256.js';
+import type { Hash } from '../storage/interfaces/hash.js';
+import type { Channel } from './channel/channel.js';
 
 export class Data {
-  constructor(private readonly storageDrivers: StorageDriver[]) {}
+  constructor(private readonly channels: Channel[]) {}
 
   private async hash(payload: string): Promise<Hash> {
     return {
@@ -14,8 +16,8 @@ export class Data {
   async get(hash: Hash): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       void Promise.allSettled<Promise<void>>(
-        this.storageDrivers.map(async (store) => {
-          const data = await store.getData(hash);
+        this.channels.map(async (store) => {
+          const data = await store.getNode(hash);
           if (!data || data.hash.algorithm !== hash.algorithm || data.hash.value !== hash.value) {
             return;
           }
@@ -36,14 +38,12 @@ export class Data {
     });
   }
 
-  /**
-   * @throws {PromiseSettledResult<void>[]}
-   */
+  /** @throws {PromiseSettledResult<void>[]} */
   async put(payload: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
-      this.storageDrivers.map(async (store) => {
-        await store.putData({
+      this.channels.map(async (store) => {
+        await store.putNode({
           hash,
           encoding: 'utf8',
           mediaType,
@@ -63,9 +63,7 @@ export class Data {
     return this.get(hash).then((payload) => JSON.parse(payload) as T);
   }
 
-  /**
-   * @throws {PromiseSettledResult<void>[]}
-   */
+  /** @throws {PromiseSettledResult<void>[]} */
   async putJSON<T>(payload: T): Promise<Hash> {
     return this.put(JSON.stringify(payload), 'application/json');
   }
@@ -73,10 +71,10 @@ export class Data {
   getNamed(name: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       void Promise.allSettled<Promise<void>>(
-        this.storageDrivers.map(async (store) => {
-          const hash = await store.getNamedDataHash(name);
+        this.channels.map(async (store) => {
+          const hash = await store.getAddressedNodeHash(name);
           if (!hash) return;
-          const data = await store.getData(hash);
+          const data = await store.getNode(hash);
           if (!data || data.hash.algorithm !== hash.algorithm || data.hash.value !== hash.value) {
             return;
           }
@@ -97,20 +95,18 @@ export class Data {
     });
   }
 
-  /**
-   * @throws {PromiseSettledResult<void>[]}
-   */
+  /** @throws {PromiseSettledResult<void>[]} */
   async putNamed(payload: string, name: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
-      this.storageDrivers.map(async (store) => {
-        await store.putData({
+      this.channels.map(async (store) => {
+        await store.putNode({
           hash,
           encoding: 'utf8',
           mediaType,
           payload,
         });
-        await store.setNamedDataHash(name, hash);
+        await store.setAddressedNodeHash(name, hash);
       }),
     );
 
@@ -125,9 +121,7 @@ export class Data {
     return this.getNamed(name).then((payload) => JSON.parse(payload) as T);
   }
 
-  /**
-   * @throws {PromiseSettledResult<void>[]}
-   */
+  /** @throws {PromiseSettledResult<void>[]} */
   putNamedJSON(payload: unknown, name: string): Promise<Hash> {
     return this.putNamed(JSON.stringify(payload), name, 'application/json');
   }

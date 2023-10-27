@@ -1,18 +1,15 @@
-import type * as Payloads from '../interfaces/payloads';
-import type { ActionMixin } from '../interfaces/mixins/action.mixin';
-import type { Payload } from './payload';
+import type * as Request from '../interfaces/payloads/requests/index.js';
+import type { ActionMixin } from '../interfaces/mixins/action.mixin.js';
+import type { Payload } from './payload.js';
 
-/**
- * Discriminated union that defines the request payloads for each action.
- */
+/** Discriminated union that defines the request payloads for each action. */
 export type RequestPayload =
   // Have no payload
   | ActionMixin<'generateIdentity'>
-  | ActionMixin<'getSessions'>
   | ActionMixin<'reset'>
   | ActionMixin<'saveSession'>
   // Have a payload
-  | Payload<'forgetIdentity', Payloads.ForgetIdentityRequest>
-  | Payload<'importIdentity', Payloads.ImportIdentityRequest>
-  | Payload<'initSession', Payloads.InitSessionRequest>
-  | Payload<'useSession', Payloads.UseSessionRequest>;
+  | Payload<'forgetIdentity', Request.ForgetIdentityRequest>
+  | Payload<'importIdentity', Request.ImportIdentityRequest>
+  | Payload<'initSession', Request.InitSessionRequest>
+  | Payload<'useSession', Request.UseSessionRequest>;

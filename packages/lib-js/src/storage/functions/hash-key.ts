@@ -1,4 +1,4 @@
-import type { Hash } from '../interfaces/hash';
+import type { Hash } from '../interfaces/hash.js';
 
 export type HashKey = string;
 

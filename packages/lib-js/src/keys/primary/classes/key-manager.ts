@@ -3,7 +3,9 @@ import type { GenerateIdentityResult } from '../../shared/interfaces/payloads/in
 import type { Action, Request, Result } from '../../shared/types/index.js';
 import { ManagedWorker } from './managed-worker.js';
 
+/** @deprecated Use `WORKER_DISPATCH`. */
 export class KeyManager {
+  /** @deprecated Use `WORKER_DISPATCH`. */
   private readonly cluster: ManagedWorker[];
 
   // TODO: use a set
@@ -29,6 +31,7 @@ export class KeyManager {
   }
 
   // TODO: further restrict T to specific actions
+  /** @deprecated Use `WORKER_DISPATCH`. */
   private postToOne<T extends Action>(request: Request<T>): Promise<Result<T>> {
     // TODO: load balancing
     if (++this.currentWorkerIndex >= this.cluster.length) {
@@ -38,6 +41,7 @@ export class KeyManager {
   }
 
   // TODO: further restrict T to specific actions
+  /** @deprecated Use `WORKER_DISPATCH`. */
   private postToAll<T extends Action>(request: Request<T>): Promise<Result<T>[]> {
     return Promise.all(this.cluster.map((worker) => worker.postJob(request)));
   }
@@ -82,82 +86,9 @@ export class KeyManager {
     }
   }
 
-  async initSession<T>(pin: string, metadata?: T): Promise<void> {
-    const initResult = await this.postToOne({
-      action: 'initSession',
-      payload: {
-        pin,
-        metadata,
-      },
-    });
-
-    await this.useSession(initResult.payload.sessionID, pin);
-  }
-
   async reset(): Promise<void> {
     await this.postToAll({ action: 'reset' });
     this._importedAddresses.length = 0;
     this._activeSession = undefined;
-  }
-
-  async useSession(sessionID: number, pin: string): Promise<void> {
-    const results = await this.postToAll({
-      action: 'useSession',
-      payload: {
-        sessionID,
-        pin,
-      },
-    });
-
-    // We need to check result from all workers and ensure they are in sync
-    // If one or more of them borked it, roll it back!
-
-    let allImportedAddresses!: Set<string>;
-    let firstRun = true;
-    let ok = true;
-
-    for (const result of results) {
-      const iterationImportedAddresses = new Set<string>(result.payload.importedAddresses);
-
-      if (!result.ok) {
-        ok = false;
-      }
-
-      if (firstRun) {
-        allImportedAddresses = iterationImportedAddresses;
-      } else {
-        if (ok) {
-          ok = allImportedAddresses.size === iterationImportedAddresses.size;
-        }
-
-        if (ok) {
-          for (const address of iterationImportedAddresses) {
-            ok = allImportedAddresses.has(address as string);
-            if (!ok) break;
-          }
-        }
-
-        if (!ok) {
-          for (const address of iterationImportedAddresses) {
-            allImportedAddresses.add(address as string);
-          }
-        }
-      }
-
-      firstRun = false;
-    }
-
-    if (ok) {
-      this._importedAddresses.length = 0;
-      for (const address of allImportedAddresses) {
-        this._importedAddresses.push(address as string);
-      }
-      this._activeSession = sessionID;
-    } else {
-      await Promise.all(
-        [...allImportedAddresses].map((address: string) => this.forgetIdentity(address)),
-      );
-      throw new KeyManagerActionError('useSession', 'One or more workers were out of sync.');
-    }
   }
 }

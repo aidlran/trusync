@@ -1,14 +1,14 @@
 import * as nacl from 'tweetnacl';
-import { generateAddress } from '../../crypto/address.js';
-import { KeyManagerError } from '../shared/errors/key-manager.error.js';
-import { KeyManagerActionError } from '../shared/errors/key-manager-action.error.js';
+import { generateAddress } from '../crypto/address.js';
+import { KeyManagerError } from '../keys/shared/errors/key-manager.error.js';
+import { KeyManagerActionError } from '../keys/shared/errors/key-manager-action.error.js';
 import type {
   GenerateIdentityResult,
   InitSessionResult,
   UseSessionResult,
-} from '../shared/interfaces/payloads/index.js';
-import type { Action, Job } from '../shared/types/index.js';
-import { create, get, put } from './indexeddb.js';
+} from '../keys/shared/interfaces/payloads/index.js';
+import type { Action, Job } from '../keys/shared/types/index.js';
+import { create, get, put } from '../keys/worker/indexeddb.js';
 
 // TODO: move and optimise these interfaces
 

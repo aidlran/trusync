@@ -15,15 +15,19 @@
   "exports": {
     ".": {
       "default": "./dist/src/index.js",
-      "types": "./dist/src/types.d.ts"
+      "types": "./dist/src/index.d.ts"
     },
     "./channel": {
       "default": "./dist/src/data/channel/index.js",
-      "types": "./dist/src/data/channel/types.d.ts"
+      "types": "./dist/src/data/channel/index.d.ts"
     },
     "./crypto": {
       "default": "./dist/src/crypto/index.js",
-      "types": "./dist/src/crypto/types.d.ts"
+      "types": "./dist/src/crypto/index.d.ts"
+    },
+    "./session": {
+      "default": "./dist/src/session/session.js",
+      "types": "./dist/src/session/session.d.ts"
     }
   },
   "scripts": {

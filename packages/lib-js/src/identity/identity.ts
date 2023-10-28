@@ -7,6 +7,7 @@ export class Identity {
 
   constructor(
     private readonly data: Data,
+    /** @deprecated Use `WORKER_DISPATCH`. */
     private readonly keyManager: KeyManager,
   ) {}
 
@@ -60,18 +61,8 @@ export class Identity {
     this.emitChange();
   }
 
-  async initSession<T>(password: string, metadata?: T): Promise<void> {
-    await this.keyManager.initSession(password, metadata);
-    this.emitChange();
-  }
-
   async reset(): Promise<void> {
     await this.keyManager.reset();
-    this.emitChange();
-  }
-
-  async useSession(sessionID: number, password: string): Promise<void> {
-    await this.keyManager.useSession(sessionID, password);
     this.emitChange();
   }
 }

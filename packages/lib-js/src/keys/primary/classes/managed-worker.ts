@@ -1,5 +1,6 @@
 import type { Action, CompletedJob, FailedJob, Request, Result } from '../../shared/types/index.js';
 
+/** @deprecated Use `WORKER_DISPATCH`. */
 export class ManagedWorker {
   private readonly worker: Worker;
   private readonly pendingJobs = new Map<number, (result: Result<Action>) => void>();

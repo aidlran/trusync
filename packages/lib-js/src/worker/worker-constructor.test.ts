@@ -2,7 +2,7 @@
 
 // TODO: does not work due to `import.meta.url`
 
-describe('workerConstructor', () => {
+describe('worker constructor', () => {
   it.todo(
     'constructs',
     // () => expect(workerConstructor()()).toBeInstanceOf(Worker)

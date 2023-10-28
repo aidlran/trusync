@@ -38,17 +38,14 @@ export function workerInstance(workerConstructor: () => Worker): WorkerInstanceC
         }
         return;
       } else {
-        // const actionCallbacks = jobCallbacks[event.data.action];
-        // if (actionCallbacks) {
         jobCallbacks[event.data.jobID]?.(event.data as Result<PublicAction>);
         delete jobCallbacks[event.data.jobID];
-        // }
       }
     };
 
     return function <T extends PublicAction>(request: Request<T>, callback?: JobCallback<T>) {
       function post() {
-        jobCallbacks[jobCounter++] = callback as JobCallback | undefined;
+        jobCallbacks[++jobCounter] = callback as JobCallback | undefined;
         // TODO: don't use spread operator
         worker.postMessage({ ...request, jobID: jobCounter });
       }

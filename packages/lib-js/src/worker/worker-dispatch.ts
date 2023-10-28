@@ -44,16 +44,16 @@ export function workerDispatch(
       callback?: WorkerPostMultiResultCallback<T>,
     ): void {
       const onResult = callback
-        ? () => {
+        ? (() => {
             let responseCount = 0;
             const responses = new Array<Result<T>>();
-            return function (result: Result<T>): void {
+            return (result: Result<T>): void => {
               responses.push(result);
               if (++responseCount === clusterSize) {
                 callback(responses);
               }
             };
-          }
+          })()
         : undefined;
       for (const worker of cluster) {
         worker(request, onResult);

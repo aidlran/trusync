@@ -32,7 +32,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "lc": "echo truSync JS: $(find bin src -type f -exec cat {} \\; | wc -l) lines",
+    "lc": "echo truSync JS: $(find bin src -type f ! -name \"*.test.ts\" -exec cat {} \\; | wc -l) lines",
     "start": "tsc --watch --preserveWatchOutput"
   },
   "dependencies": {

@@ -21,7 +21,7 @@ jobs:
         node-version: [18]
     name: JS / Build / Node v${{ matrix.node-version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
@@ -33,13 +33,25 @@ jobs:
     runs-on: ubuntu-latest
     name: JS / Lint
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: npm
       - run: npm ci
       - run: npm run lint:js
+
+  js-test:
+    runs-on: ubuntu-latest
+    name: JS / Test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+      - run: npm ci
+      - run: npm run test:js
 
   svelte-build:
     runs-on: ubuntu-latest
@@ -50,7 +62,7 @@ jobs:
         svelte-version: [^3.55.0, ^4.0.0]
     name: Svelte / Build / Svelte ${{ matrix.svelte-version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node }}
@@ -64,7 +76,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Svelte / Lint
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v3
         with:
           node-version: 18

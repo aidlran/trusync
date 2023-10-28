@@ -1,5 +1,6 @@
 .svelte-kit
 dist
 node_modules
+*.test.ts
 LICENSE
 package-lock.json

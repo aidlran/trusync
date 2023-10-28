@@ -18,18 +18,41 @@ export interface InactiveSession<T = unknown> extends BaseSession<T> {
 
 export type Session<T = unknown> = ActiveSession<T> | InactiveSession<T>;
 export type Sessions = Partial<Record<number, Session>>;
-export type SessionsCallback = (sessions: Sessions) => unknown;
 
 const sessions: Sessions = {};
-let activeSession: ActiveSession | undefined;
-let emitChange: undefined | (() => void);
+let emitSessionsChange: undefined | (() => void);
 
-export function clearOnChange() {
-  emitChange = undefined;
+/** Clear the callback function that is called when ANY change occurs to sessions. */
+export function clearOnSessionsChange() {
+  emitSessionsChange = undefined;
 }
 
-export function setOnChange(callback: SessionsCallback) {
-  emitChange = () => callback({ ...sessions });
+/**
+ * Register or replace the callback function that is called when ANY change occurs to sessions.
+ *
+ * @param callback A callback that may accept a shallow clone of the sessions map.
+ */
+export function setOnSessionsChange(callback: (sessions: Sessions) => unknown) {
+  emitSessionsChange = () => callback({ ...sessions });
+}
+
+let activeSession: ActiveSession | undefined;
+let emitActiveSessionChange: undefined | (() => void);
+
+/** Clear the callback function that is called when the active session changes. */
+export function clearOnActiveSessionChange() {
+  emitActiveSessionChange = undefined;
+}
+
+/**
+ * Register or replace the callback function that is called when the active session changes.
+ *
+ * @param callback A callback that may accept the changed active session object.
+ */
+export function setOnActiveSessionChange(
+  callback: (activeSession: ActiveSession | undefined) => unknown,
+) {
+  emitActiveSessionChange = () => callback(activeSession);
 }
 
 export async function getSessions(): Promise<Sessions> {
@@ -43,7 +66,7 @@ export async function getSessions(): Promise<Sessions> {
     existingSession.active ??= false;
     sessions[session.id] = existingSession as Session;
   }
-  emitChange?.();
+  emitSessionsChange?.();
   return sessions;
 }
 
@@ -139,7 +162,8 @@ export function useSession(
           new KeyManagerActionError('useSession', 'One or more workers were out of sync.'),
         );
       }
-      emitChange?.();
+      emitActiveSessionChange?.();
+      emitSessionsChange?.();
     },
   );
 }

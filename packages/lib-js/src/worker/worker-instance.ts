@@ -30,13 +30,10 @@ export function workerInstance(workerConstructor: () => Worker): WorkerInstanceC
       if (event.data.action === 'workerReady') {
         if (readyCallbacks) {
           for (const callback of readyCallbacks) {
-            // TODO: why is this being flagged?
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            callback();
+            (callback as () => void)();
           }
           readyCallbacks = undefined;
         }
-        return;
       } else {
         jobCallbacks[event.data.jobID]?.(event.data as Result<PublicAction>);
         delete jobCallbacks[event.data.jobID];

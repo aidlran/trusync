@@ -19,8 +19,8 @@
     "lint:js": "eslint packages/lib-js",
     "lint:svelte": "eslint packages/lib-svelte",
     "start": "conc -kn js,svelte \"npm start -w packages/lib-js\" \"npm start -w packages/lib-svelte\"",
-    "test": "npm run test:js",
-    "test:js": "jest packages/lib-js"
+    "test": "jest packages/lib-js",
+    "test:coverage": "jest --coverage packages/lib-js"
   },
   "devDependencies": {
     "@types/jest": "^29.5.6",

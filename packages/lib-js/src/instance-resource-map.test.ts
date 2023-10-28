@@ -9,13 +9,13 @@ describe('instance resource map', () => {
     }
   });
 
-  it('key maps to the same thing', () => {
-    const KEY = 'a key';
+  it('tracks objects', () => {
     const map = instanceResourceMap(Array);
-    const value = map(KEY);
-    const item = { a: 'a' };
-    value.item = item;
-    expect(map(KEY)).toBe(value);
-    expect(map(KEY).item).toBe(item);
+    const entryDefault = map();
+    const entry1 = map('1');
+    const entry2 = map('2');
+    expect(map()).toBe(entryDefault);
+    expect(map('1')).toBe(entry1);
+    expect(map('2')).toBe(entry2);
   });
 });

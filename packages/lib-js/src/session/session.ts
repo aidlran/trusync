@@ -148,7 +148,6 @@ export function useSession(
         activeSession.active = true;
         activeSession.identities = allImportedAddresses;
         callback?.(activeSession);
-        activeSession.onChange?.(activeSession);
       } else {
         // TODO: if workers are out of sync, clear the session
         // prev code:

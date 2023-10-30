@@ -1,9 +1,13 @@
-import { KeyManagerActionError } from '../keys/shared/index.js';
+import * as nacl from 'tweetnacl';
+import { generateAddress } from '../crypto/address.js';
+import { KeyManagerActionError, type GenerateIdentityResult } from '../keys/shared/index.js';
 import { type Session as DBSession, getAll } from '../keys/worker/indexeddb.js';
 import { WORKER_DISPATCH } from '../worker/index.js';
 
-type BaseSession<T = unknown> = Omit<DBSession<T>, 'salt' | 'nonce' | 'payload'> & {
-  id: number;
+type BaseSession<T = unknown> = Omit<DBSession<T>, 'id' | 'salt' | 'nonce' | 'payload'> & {
+  active: boolean;
+  id?: number;
+  identities?: Set<string>;
   onChange?: (session: Session) => unknown;
 };
 
@@ -55,6 +59,66 @@ export function setOnActiveSessionChange(
   emitActiveSessionChange = () => callback(activeSession);
 }
 
+export function clearSession(callback?: () => unknown): void {
+  WORKER_DISPATCH.postToAll({ action: 'clearSession' }, () => {
+    if (activeSession) {
+      (activeSession as Session).active = false;
+      delete (activeSession as Session).identities;
+      activeSession = undefined;
+    }
+    callback?.();
+    emitActiveSessionChange?.();
+    emitSessionsChange?.();
+  });
+}
+
+export function forgetIdentity(address: string, callback?: () => unknown): void {
+  WORKER_DISPATCH.postToAll(
+    {
+      action: 'forgetIdentity',
+      payload: { address },
+    },
+    () => {
+      activeSession?.identities.delete(address);
+      callback?.();
+      emitActiveSessionChange?.();
+      emitSessionsChange?.();
+    },
+  );
+}
+
+export async function generateIdentity(): Promise<GenerateIdentityResult> {
+  // TODO: move crypto functions to `src/crypto`
+  // TODO: replace with WebCrypto implementation
+  const encryptionKeyPair = nacl.box.keyPair();
+  const signingKeyPair = nacl.sign.keyPair.fromSeed(encryptionKeyPair.secretKey);
+  const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);
+
+  const identity: GenerateIdentityResult = {
+    address,
+    encryption: {
+      publicKey: encryptionKeyPair.publicKey,
+      type: 0,
+    },
+    secret: encryptionKeyPair.secretKey,
+    signing: {
+      publicKey: signingKeyPair.publicKey,
+      type: 0,
+    },
+  };
+
+  // TODO: create identity graph node
+  // await data.putNamedJSON(
+  //   {
+  //     encryption: identity.encryption,
+  //     signing: identity.signing,
+  //   },
+  //   identity.address.value,
+  // );
+
+  return identity;
+}
+
 export async function getSessions(): Promise<Sessions> {
   // TODO: replace promise with callback
   const retrievedSessions = (await getAll('session')) as Array<DBSession & { id: number }>;
@@ -68,6 +132,43 @@ export async function getSessions(): Promise<Sessions> {
   }
   emitSessionsChange?.();
   return sessions;
+}
+
+export function importIdentity(
+  address: string,
+  secret: Uint8Array,
+  callback?: (error?: KeyManagerActionError<'importIdentity'>) => unknown,
+): void {
+  if (activeSession?.identities.has(address)) {
+    callback?.(
+      new KeyManagerActionError('importIdentity', `Address '${address}' is already imported.`),
+    );
+    return;
+  }
+  WORKER_DISPATCH.postToAll(
+    {
+      action: 'importIdentity',
+      payload: {
+        address,
+        secret,
+      },
+    },
+    (results) => {
+      for (const result of results) {
+        if (!result.ok) {
+          forgetIdentity('address');
+          throw new KeyManagerActionError('importIdentity', result.error ?? 'Unknown error.');
+        }
+      }
+      (activeSession ??= {
+        active: true,
+        identities: new Set(),
+      })?.identities.add(address);
+      if (activeSession?.id) {
+        WORKER_DISPATCH.postToOne({ action: 'saveSession' });
+      }
+    },
+  );
 }
 
 export function initSession(

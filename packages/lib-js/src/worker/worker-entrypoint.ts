@@ -71,6 +71,8 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
   try {
     const result = await (() => {
       switch (event.data.action) {
+        case 'clearSession':
+          return clearSession();
         case 'forgetIdentity':
           return forgetIdentity(event.data);
         case 'generateIdentity':
@@ -79,8 +81,6 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
           return importIdentity(event.data);
         case 'initSession':
           return initSession(event.data);
-        case 'reset':
-          return reset();
         case 'saveSession':
           return saveSession(event.data);
         case 'useSession':
@@ -165,6 +165,11 @@ async function encryptSession(secretKey: CryptoKey): Promise<SymmetricEncryptDat
 
 // Job handler functions
 // TODO: move to individual files
+
+function clearSession(): void {
+  importedIdentities.length = 0;
+  session = undefined;
+}
 
 function forgetIdentity(job: Job<'forgetIdentity'>): void {
   const foundIndex = importedIdentities.findIndex(
@@ -251,11 +256,6 @@ async function initSession(job: Job<'initSession'>): Promise<InitSessionResult> 
   return {
     sessionID: id as number,
   };
-}
-
-function reset(): void {
-  importedIdentities.length = 0;
-  session = undefined;
 }
 
 async function saveSession(job: Job<'saveSession'>): Promise<void> {

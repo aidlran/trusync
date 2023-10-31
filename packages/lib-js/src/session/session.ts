@@ -5,18 +5,20 @@ import { type Session as DBSession, getAll } from '../keys/worker/indexeddb.js';
 import { WORKER_DISPATCH } from '../worker/index.js';
 
 type BaseSession<T = unknown> = Omit<DBSession<T>, 'id' | 'salt' | 'nonce' | 'payload'> & {
-  active: boolean;
   id?: number;
+  active: boolean;
   identities?: Set<string>;
   onChange?: (session: Session) => unknown;
 };
 
 export interface ActiveSession<T = unknown> extends BaseSession<T> {
+  id?: number;
   active: true;
   identities: Set<string>;
 }
 
 export interface InactiveSession<T = unknown> extends BaseSession<T> {
+  id: number;
   active: false;
 }
 
@@ -143,32 +145,38 @@ export function importIdentity(
     callback?.(
       new KeyManagerActionError('importIdentity', `Address '${address}' is already imported.`),
     );
-    return;
-  }
-  WORKER_DISPATCH.postToAll(
-    {
-      action: 'importIdentity',
-      payload: {
-        address,
-        secret,
+  } else {
+    WORKER_DISPATCH.postToAll(
+      {
+        action: 'importIdentity',
+        payload: {
+          address,
+          secret,
+        },
       },
-    },
-    (results) => {
-      for (const result of results) {
-        if (!result.ok) {
-          forgetIdentity('address');
-          throw new KeyManagerActionError('importIdentity', result.error ?? 'Unknown error.');
+      (results) => {
+        for (const result of results) {
+          if (!result.ok) {
+            forgetIdentity('address');
+            callback?.(
+              new KeyManagerActionError('importIdentity', result.error ?? 'Unknown error.'),
+            );
+            return;
+          }
         }
-      }
-      (activeSession ??= {
-        active: true,
-        identities: new Set(),
-      })?.identities.add(address);
-      if (activeSession?.id) {
-        WORKER_DISPATCH.postToOne({ action: 'saveSession' });
-      }
-    },
-  );
+        (activeSession ??= {
+          active: true,
+          identities: new Set(),
+        })?.identities.add(address);
+        callback?.();
+        emitActiveSessionChange?.();
+        emitSessionsChange?.();
+        if (activeSession?.id) {
+          WORKER_DISPATCH.postToOne({ action: 'saveSession' });
+        }
+      },
+    );
+  }
 }
 
 export function initSession(

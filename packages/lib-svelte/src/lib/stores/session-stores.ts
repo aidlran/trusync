@@ -14,8 +14,8 @@ export const activeSessionStore: Readable<ActiveSession | undefined> = (() => {
   return { subscribe };
 })();
 
-export const allSessionsStore: Readable<Sessions | undefined> = (() => {
-  const { update, subscribe } = writable<Sessions>();
+export const allSessionsStore: Readable<Sessions> = (() => {
+  const { update, subscribe } = writable<Sessions>({});
   setOnSessionsChange((sessions) => update(() => sessions));
   void getSessions();
   return { subscribe };

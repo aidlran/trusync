@@ -4,5 +4,5 @@
  */
 export function workerConstructor(): () => Worker {
   return () =>
-    new Worker(new URL('./worker-entrypoint.js?worker', import.meta.url), { type: 'module' });
+    new Worker(new URL('./worker-entrypoint?worker', import.meta.url), { type: 'module' });
 }

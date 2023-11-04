@@ -7,5 +7,6 @@
     "target": "ES2015",
     "verbatimModuleSyntax": true
   },
-  "include": ["bin", "src"]
+  "include": ["bin", "src"],
+  "exclude": ["src/**/*.test.ts"]
 }

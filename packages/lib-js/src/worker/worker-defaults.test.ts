@@ -1,7 +1,7 @@
 import { describe, expect, it, vitest } from 'vitest';
 import { calculateClusterSize } from './worker-defaults.js';
 
-describe('calculateClustersize', () => {
+describe('calculateClusterSize', () => {
   it('provides default', () => {
     expect(typeof calculateClusterSize()).toBe('number');
   });

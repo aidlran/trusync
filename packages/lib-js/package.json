@@ -32,14 +32,19 @@
   },
   "scripts": {
     "build": "tsc",
-    "lc": "echo truSync JS: $(find bin src -type f -exec cat {} \\; | wc -l) lines",
-    "start": "tsc --watch --preserveWatchOutput"
+    "lc": "echo truSync JS: $(find bin src -type f ! -name \"*.test.ts\" -exec cat {} \\; | wc -l) lines",
+    "start": "tsc --watch --preserveWatchOutput",
+    "test": "vitest run"
   },
   "dependencies": {
     "base-x": "^4.0.0",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
-    "typescript": "~5.2.2"
+    "@vitest/coverage-v8": "^0.34.6",
+    "happy-dom": "^12.10.3",
+    "typescript": "~5.2.2",
+    "vite": "^4.5.0",
+    "vitest": "^0.34.6"
   }
 }

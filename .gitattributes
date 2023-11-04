@@ -1,0 +1,2 @@
+*.config.js linguist-vendored
+*.test.ts   linguist-documentation

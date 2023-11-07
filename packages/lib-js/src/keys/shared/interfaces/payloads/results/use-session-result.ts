@@ -1,3 +1,5 @@
 export interface UseSessionResult {
-  importedAddresses: string[];
+  id: number;
+  identities: string[];
+  metadata?: unknown;
 }

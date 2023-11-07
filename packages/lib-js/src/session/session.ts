@@ -215,7 +215,7 @@ export function useSession(
       let ok = true;
 
       for (const result of results) {
-        const iterationImportedAddresses = new Set<string>(result.payload.importedAddresses);
+        const iterationImportedAddresses = new Set<string>(result.payload.identities);
 
         if (!result.ok) {
           ok = false;
@@ -253,22 +253,20 @@ export function useSession(
 
       if (ok) {
         // TODO: we need to return all session details in the result and update them here
-        activeSession = (sessions[sessionID] ??= {} as ActiveSession) as ActiveSession;
+        activeSession = (sessions[sessionID] ??= {
+          id: sessionID,
+          metadata: results[0].payload.metadata,
+        } as ActiveSession) as ActiveSession;
         activeSession.active = true;
         activeSession.identities = allImportedAddresses;
         callback?.(activeSession);
       } else {
-        // TODO: if workers are out of sync, clear the session
-        // prev code:
-        // await Promise.all(
-        //   [...allImportedAddresses].map((address: string) => this.forgetIdentity(address)),
-        // );
-
+        clearSession();
         // TODO: return more accurate error if pin incorrect
-
         callback?.(
           new KeyManagerActionError('useSession', 'One or more workers were out of sync.'),
         );
+        return;
       }
       emitActiveSessionChange?.();
       emitSessionsChange?.();

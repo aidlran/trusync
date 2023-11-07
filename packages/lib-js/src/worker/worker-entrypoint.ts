@@ -317,7 +317,7 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
   const serialised = JSON.parse(new TextDecoder().decode(message)) as SerialisedSession<
     Record<number, number>
   >;
-  const importedAddresses = new Array<string>();
+  const identities = new Array<string>();
 
   importedIdentities.length = 0;
   importedIdentities.push(
@@ -335,7 +335,7 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
           throw errorResponse('Invalid secret', job.action, job.jobID);
         }
 
-        importedAddresses.push(address.value);
+        identities.push(address.value);
 
         return {
           address,
@@ -361,5 +361,9 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
     metadata,
   };
 
-  return { importedAddresses };
+  return {
+    id: id as number,
+    identities,
+    metadata,
+  };
 }

@@ -10,13 +10,13 @@ import {
 export const activeSessionStore: Readable<ActiveSession | undefined> = (() => {
   const { update, subscribe } = writable<ActiveSession | undefined>();
   setOnActiveSessionChange((session) => update(() => session));
-  void getSessions();
+  if (globalThis.window) void getSessions();
   return { subscribe };
 })();
 
 export const allSessionsStore: Readable<Sessions | undefined> = (() => {
   const { update, subscribe } = writable<Sessions>();
   setOnSessionsChange((sessions) => update(() => sessions));
-  void getSessions();
+  if (globalThis.window) void getSessions();
   return { subscribe };
 })();

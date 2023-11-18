@@ -39,14 +39,14 @@
     "trusync": "*"
   },
   "devDependencies": {
-    "@playwright/test": "^1.39.0",
+    "@playwright/test": "^1.40.0",
     "@sveltejs/adapter-auto": "^2.1.0",
-    "@sveltejs/kit": "^1.27.4",
+    "@sveltejs/kit": "^1.27.6",
     "@sveltejs/package": "^2.2.2",
     "concurrently": "^8.2.2",
     "publint": "^0.2.5",
-    "svelte": "^4.2.2",
-    "svelte-check": "^3.5.2",
+    "svelte": "^4.2.5",
+    "svelte-check": "^3.6.0",
     "trusync": "file:../lib-js",
     "tslib": "^2.6.2",
     "typescript": "~5.2.2",

@@ -1,5 +1,5 @@
 import * as nacl from 'tweetnacl';
-import { generateAddress } from '../crypto/address.js';
+import { concatenateByteArray, derivedShaB58 } from '../crypto/index.js';
 import { KeyManagerError } from '../keys/shared/errors/key-manager.error.js';
 import { KeyManagerActionError } from '../keys/shared/errors/key-manager-action.error.js';
 import type {
@@ -185,7 +185,9 @@ async function generateIdentity(): Promise<GenerateIdentityResult> {
   // TODO: replace with WebCrypto implementation
   const encryptionKeyPair = nacl.box.keyPair();
   const signingKeyPair = nacl.sign.keyPair.fromSeed(encryptionKeyPair.secretKey);
-  const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);
+  const address = await derivedShaB58(
+    concatenateByteArray(encryptionKeyPair.publicKey, signingKeyPair.publicKey),
+  );
 
   return {
     address,
@@ -210,7 +212,9 @@ async function importIdentity(job: Job<'importIdentity'>): Promise<void> {
   // TODO: replace with WebCrypto implementation
   const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(job.payload.secret);
   const signingKeyPair = nacl.sign.keyPair.fromSeed(job.payload.secret);
-  const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);
+  const address = await derivedShaB58(
+    concatenateByteArray(encryptionKeyPair.publicKey, signingKeyPair.publicKey),
+  );
 
   if (address.value !== job.payload.address) {
     throw errorResponse('Invalid secret', job.action, job.jobID);
@@ -326,9 +330,8 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
         const secret = new Uint8Array(Object.values(identity.secret));
         const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(secret);
         const signingKeyPair = nacl.sign.keyPair.fromSeed(secret);
-        const address = await generateAddress(
-          encryptionKeyPair.publicKey,
-          signingKeyPair.publicKey,
+        const address = await derivedShaB58(
+          concatenateByteArray(encryptionKeyPair.publicKey, signingKeyPair.publicKey),
         );
 
         if (address.value !== identity.address) {

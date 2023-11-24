@@ -1,5 +1,5 @@
 import * as nacl from 'tweetnacl';
-import { generateAddress } from '../crypto/address.js';
+import { concatenateByteArray, derivedShaB58 } from '../crypto/index.js';
 import { KeyManagerActionError, type GenerateIdentityResult } from '../keys/shared/index.js';
 import { type Session as DBSession, getAll } from '../keys/worker/indexeddb.js';
 import { WORKER_DISPATCH } from '../worker/index.js';
@@ -94,7 +94,9 @@ export async function generateIdentity(): Promise<GenerateIdentityResult> {
   // TODO: replace with WebCrypto implementation
   const encryptionKeyPair = nacl.box.keyPair();
   const signingKeyPair = nacl.sign.keyPair.fromSeed(encryptionKeyPair.secretKey);
-  const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);
+  const address = await derivedShaB58(
+    concatenateByteArray(encryptionKeyPair.publicKey, signingKeyPair.publicKey),
+  );
 
   const identity: GenerateIdentityResult = {
     address,

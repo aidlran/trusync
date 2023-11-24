@@ -1,4 +1,4 @@
-import { moduleProvider } from '../../modules/module-provider.js';
+import { createModule } from '../../module/create-module.js';
 import type { Hash } from '../../storage/interfaces/hash.js';
 import type { RawData } from '../../storage/interfaces/raw-data.js';
 
@@ -19,4 +19,4 @@ export interface Channel {
  * @param key The target protocol instance's key.
  * @returns The protocol's channel set.
  */
-export const getChannels = moduleProvider('channel', () => new Array<Channel>());
+export const getChannels = createModule('channel', () => new Array<Channel>());

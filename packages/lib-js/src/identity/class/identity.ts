@@ -1,6 +1,6 @@
-import type { Address } from '../crypto/address/types.js';
-import type { Data } from '../data/data.js';
-import type { Hash } from '../storage/interfaces/hash.js';
+import type { Address } from '../../crypto/address/types.js';
+import type { Data } from '../../data/data.js';
+import type { Hash } from '../../storage/interfaces/hash.js';
 
 export class Identity {
   constructor(

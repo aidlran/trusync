@@ -1,7 +1,4 @@
-import data from '../data/index.js';
-import { moduleProvider } from '../modules/module-provider.js';
-import { identityFactory } from './factory.js';
+export type { Identity } from './class/identity.js';
+export type { GeneratedIdentity } from './function/generate.js';
 
-export const identity = moduleProvider('identity', (key) => identityFactory(data(key)));
-
-export default identity;
+export { identityModule as identity } from './identity.module.js';

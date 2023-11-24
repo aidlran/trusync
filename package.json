@@ -19,7 +19,9 @@
     "lint:js": "eslint packages/lib-js",
     "lint:svelte": "eslint packages/lib-svelte",
     "start": "conc -kn js,svelte \"npm start -w packages/lib-js\" \"npm start -w packages/lib-svelte\"",
-    "test": "npm run test --workspaces"
+    "test": "npm run test --workspaces",
+    "test:js": "npm run test -w packages/lib-js",
+    "test:svelte": "npm run test -w packages/lib-svelte"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.12.0",

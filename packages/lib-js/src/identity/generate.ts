@@ -1,5 +1,5 @@
 import * as nacl from 'tweetnacl';
-import { generateAddress } from '../crypto/address.js';
+import { concatenateByteArray, derivedShaB58 } from '../crypto/index.js';
 import { Identity } from './identity.js';
 
 export async function generate(): Promise<{
@@ -10,7 +10,9 @@ export async function generate(): Promise<{
   // TODO: replace with WebCrypto implementation
   const encryptionKeyPair = nacl.box.keyPair();
   const signingKeyPair = nacl.sign.keyPair.fromSeed(encryptionKeyPair.secretKey);
-  const address = await generateAddress(encryptionKeyPair.publicKey, signingKeyPair.publicKey);
+  const address = await derivedShaB58(
+    concatenateByteArray(encryptionKeyPair.publicKey, signingKeyPair.publicKey),
+  );
 
   return {
     secret: encryptionKeyPair.secretKey,

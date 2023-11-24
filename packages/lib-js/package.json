@@ -25,6 +25,10 @@
       "default": "./dist/src/crypto/index.js",
       "types": "./dist/src/crypto/index.d.ts"
     },
+    "./identity": {
+      "default": "./dist/src/identity/index.js",
+      "types": "./dist/src/identity/index.d.ts"
+    },
     "./session": {
       "default": "./dist/src/session/session.js",
       "types": "./dist/src/session/session.d.ts"

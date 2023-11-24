@@ -16,8 +16,8 @@ export class Data {
   async get(hash: Hash): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       void Promise.allSettled<Promise<void>>(
-        this.channels.map(async (store) => {
-          const data = await store.getNode(hash);
+        this.channels.map(async (channel) => {
+          const data = await channel.getNode(hash);
           if (!data || data.hash.algorithm !== hash.algorithm || data.hash.value !== hash.value) {
             return;
           }
@@ -42,8 +42,8 @@ export class Data {
   async put(payload: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
-      this.channels.map(async (store) => {
-        await store.putNode({
+      this.channels.map(async (channel) => {
+        await channel.putNode({
           hash,
           encoding: 'utf8',
           mediaType,
@@ -71,10 +71,10 @@ export class Data {
   getNamed(name: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       void Promise.allSettled<Promise<void>>(
-        this.channels.map(async (store) => {
-          const hash = await store.getAddressedNodeHash(name);
+        this.channels.map(async (channel) => {
+          const hash = await channel.getAddressedNodeHash(name);
           if (!hash) return;
-          const data = await store.getNode(hash);
+          const data = await channel.getNode(hash);
           if (!data || data.hash.algorithm !== hash.algorithm || data.hash.value !== hash.value) {
             return;
           }
@@ -99,14 +99,14 @@ export class Data {
   async putNamed(payload: string, name: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
-      this.channels.map(async (store) => {
-        await store.putNode({
+      this.channels.map(async (channel) => {
+        await channel.putNode({
           hash,
           encoding: 'utf8',
           mediaType,
           payload,
         });
-        await store.setAddressedNodeHash(name, hash);
+        await channel.setAddressedNodeHash(name, hash);
       }),
     );
 

@@ -4,7 +4,7 @@ import { AddressType, type Address } from './types.js';
 
 export function derivedShaB58(
   source: Uint8Array,
-  callback?: (address: Address) => never,
+  callback?: (address: Address) => unknown,
 ): Promise<Address> {
   return sha256(source).then((hash) => {
     const address: Address = {

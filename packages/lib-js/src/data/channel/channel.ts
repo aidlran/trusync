@@ -19,4 +19,4 @@ export interface Channel {
  * @param key The target protocol instance's key.
  * @returns The protocol's channel set.
  */
-export const getChannels = createModule('channel', () => new Array<Channel>());
+export const getChannels = createModule(() => new Array<Channel>());

@@ -20,7 +20,7 @@ export type WorkerInstanceConstructor = (...args: never[]) => WorkerInstance;
  * @returns A function that creates a `WorkerInstance`.
  */
 export function workerInstance(workerConstructor: () => Worker): WorkerInstanceConstructor {
-  return function (): WorkerInstance {
+  return (): WorkerInstance => {
     let readyCallbacks: Set<() => void> | undefined = new Set();
     let jobCounter = 0;
     const jobCallbacks: Record<number, JobCallback | undefined> = {};

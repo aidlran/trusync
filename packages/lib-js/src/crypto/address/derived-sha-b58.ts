@@ -9,7 +9,7 @@ export function derivedShaB58(
   return sha256(source).then((hash) => {
     const address: Address = {
       type: AddressType.DERIVED_SHA_B58,
-      value: base58.encode(hash),
+      value: base58.encode(hash.value),
     };
     if (callback) {
       callback(address);

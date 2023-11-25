@@ -7,7 +7,7 @@ export function createModule<T>(
   constructor: (appID: string) => T,
 ): (appID?: string) => T {
   const INSTANCES: Record<string, T> = {};
-  return function (appID = ''): T {
+  return (appID = ''): T => {
     if (DEPENDENCY_SET.has(moduleID)) {
       throw new CircularDependencyError(moduleID, DEPENDENCY_SET);
     }

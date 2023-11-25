@@ -9,7 +9,7 @@ export class Data {
   private async hash(payload: string): Promise<Hash> {
     return {
       algorithm: 'sha256',
-      value: base64.encode(await sha256(payload)),
+      value: base64.encode((await sha256(payload)).value),
     };
   }
 

@@ -1,7 +1,7 @@
 import { base64 } from '../crypto/encode/base.js';
 import { sha256 } from '../crypto/hash/sha256.js';
 import type { Hash } from '../storage/interfaces/hash.js';
-import type { Channel } from './channel/channel.js';
+import type { Channel } from '../channel/channel.js';
 
 export class Data {
   constructor(private readonly channels: Channel[]) {}

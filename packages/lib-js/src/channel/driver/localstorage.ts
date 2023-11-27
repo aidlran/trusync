@@ -1,6 +1,6 @@
-import { getHash, getHashKey } from '../../../storage/functions/hash-key.js';
-import type { Hash } from '../../../storage/interfaces/hash.js';
-import type { RawData } from '../../../storage/interfaces/raw-data.js';
+import { getHash, getHashKey } from '../../storage/functions/hash-key.js';
+import type { Hash } from '../../storage/interfaces/hash.js';
+import type { RawData } from '../../storage/interfaces/raw-data.js';
 import type { Channel } from '../channel.js';
 
 export class LocalStorageChannel implements Channel {

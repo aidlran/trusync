@@ -1,5 +1,5 @@
 import { type Hash, sha256 } from '../crypto/hash/index.js';
-import type { Channel } from '../data/channel/channel.js';
+import type { Channel } from '../channel/channel.js';
 
 type DeepReadonly<T> = {
   readonly [K in keyof T]: T[K] extends object ? DeepReadonly<T[K]> : T[K];

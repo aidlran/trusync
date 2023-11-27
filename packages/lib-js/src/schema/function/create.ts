@@ -1,4 +1,4 @@
-import type { Channel } from '../../data/channel/channel.js';
+import type { Channel } from '../../channel/channel.js';
 import { Node } from '../../node/node.js';
 import type { SchemaConfig } from '../interface/schema-config.js';
 

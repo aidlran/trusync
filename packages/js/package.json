@@ -7,7 +7,7 @@
   "author": "Aidan Loughran",
   "repository": "github:aidlran/trusync",
   "bugs": "https://github.com/aidlran/trusync/issues",
-  "homepage": "https://github.com/aidlran/trusync/tree/main/packages/lib-js#readme",
+  "homepage": "https://github.com/aidlran/trusync/tree/main/packages/js#readme",
   "main": "dist/src/index.js",
   "bin": "dist/bin/trusync.js",
   "type": "module",
@@ -18,8 +18,8 @@
       "types": "./dist/src/index.d.ts"
     },
     "./channel": {
-      "default": "./dist/src/data/channel/index.js",
-      "types": "./dist/src/data/channel/index.d.ts"
+      "default": "./dist/src/channel/index.js",
+      "types": "./dist/src/channel/index.d.ts"
     },
     "./crypto": {
       "default": "./dist/src/crypto/index.js",
@@ -28,6 +28,10 @@
     "./identity": {
       "default": "./dist/src/identity/index.js",
       "types": "./dist/src/identity/index.d.ts"
+    },
+    "./schema": {
+      "default": "./dist/src/session/session.js",
+      "types": "./dist/src/session/session.d.ts"
     },
     "./session": {
       "default": "./dist/src/session/session.js",

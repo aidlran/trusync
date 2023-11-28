@@ -2,7 +2,7 @@
 
 ## About
 
-This package cybernetically enhances [truSync](https://github.com/aidlran/trusync/tree/main/packages/lib-js) with reactive [stores](https://svelte.dev/docs/svelte-components#script-4-prefix-stores-with-$-to-access-their-values) and convenient components for Svelte app development.
+This package cybernetically enhances [truSync](https://github.com/aidlran/trusync/tree/main/packages/js) with reactive [stores](https://svelte.dev/docs/svelte-components#script-4-prefix-stores-with-$-to-access-their-values) and convenient components for Svelte app development.
 
 ## Usage
 

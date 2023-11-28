@@ -47,7 +47,7 @@ jobs:
           node-version: 18
           cache: npm
       - run: npm ci
-      - run: npm run test -w packages/lib-js
+      - run: npm run test -w packages/js
 
   svelte-build:
     runs-on: ubuntu-latest

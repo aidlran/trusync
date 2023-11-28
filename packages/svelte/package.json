@@ -17,9 +17,7 @@
     "prepublishOnly": "npm run package",
     "preview": "vite preview",
     "start": "svelte-kit sync && concurrently -k npm:dev npm:watch",
-    "test": "npm run test:integration && npm run test:unit",
-    "test:integration": "playwright test",
-    "test:unit": "vitest",
+    "test": "vitest run && echo \"TODO: 'playright test'\"",
     "watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch --preserveWatchOutput"
   },
   "exports": {

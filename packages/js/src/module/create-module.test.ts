@@ -2,18 +2,16 @@ import { describe, expect, it, test } from 'vitest';
 import { createModule } from './create-module.js';
 
 describe('create module', () => {
-  it('creates', () => {
-    test('with set constructor', () => {
-      const getModule = createModule(() => new Set());
-      expect(getModule).toBeTypeOf('function');
-      expect(getModule()).toBeInstanceOf(Set);
-    });
+  test('creates with set constructor', () => {
+    const getModule = createModule(() => new Set());
+    expect(getModule).toBeTypeOf('function');
+    expect(getModule()).toBeInstanceOf(Set);
+  });
 
-    test('with array literal', () => {
-      const getModule = createModule(() => []);
-      expect(getModule).toBeTypeOf('function');
-      expect(getModule()).toBeInstanceOf(Array);
-    });
+  test('creates with array literal', () => {
+    const getModule = createModule(() => []);
+    expect(getModule).toBeTypeOf('function');
+    expect(getModule()).toBeInstanceOf(Array);
   });
 
   it('tracks instances', () => {

@@ -1,5 +1,5 @@
-import type { Hash } from '../storage/interfaces/hash.js';
-import type { RawData } from '../storage/interfaces/raw-data.js';
+import type { Hash } from './interfaces/hash.js';
+import type { RawData } from './interfaces/raw-data.js';
 
 type MaybePromise<T = void> = T | Promise<T>;
 type GetResult<T> = MaybePromise<T | null | undefined>;

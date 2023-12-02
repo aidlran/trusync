@@ -1,6 +1,6 @@
-import { type HashKey, getHashKey, getHash } from '../../storage/functions/hash-key.js';
-import type { Hash } from '../../storage/interfaces/hash.js';
-import type { RawData } from '../../storage/interfaces/raw-data.js';
+import { type HashKey, getHashKey, getHash } from '../functions/hash-key.js';
+import type { Hash } from '../interfaces/hash.js';
+import type { RawData } from '../interfaces/raw-data.js';
 import type { Channel } from '../channel.js';
 
 export class MemoryChannel implements Channel {

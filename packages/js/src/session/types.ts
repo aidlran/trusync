@@ -1,4 +1,4 @@
-import type { Session as DBSession } from '../keys/worker/indexeddb.js';
+import type { Session as DBSession } from '../indexeddb/indexeddb.js';
 import type { Observable } from '../observable/observable.js';
 
 type BaseSession<T = unknown> = Omit<DBSession<T>, 'id' | 'salt' | 'nonce' | 'payload'> & {

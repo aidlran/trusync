@@ -1,4 +1,4 @@
-import type { Action, CompletedJob, Request, Result } from '../keys/shared/types/index.js';
+import type { Action, CompletedJob, Request, Result } from './types/index.js';
 
 export type PublicAction = Exclude<Action, 'workerReady'>;
 

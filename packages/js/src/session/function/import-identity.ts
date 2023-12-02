@@ -1,11 +1,11 @@
-import { KeyManagerActionError } from '../../keys/shared/index.js';
+import { WorkerJobError } from '../../error/worker-job-error.js';
 import type { WorkerDispatch } from '../../worker/worker-dispatch.js';
 import type { ActiveSessionObservable, AllSessionsObservable } from '../types.js';
 
-export type ImportIdentityCallback = (error?: KeyManagerActionError<'importIdentity'>) => unknown;
+export type ImportIdentityCallback = (error?: WorkerJobError<'importIdentity'>) => unknown;
 
 function error(message: string, callback?: ImportIdentityCallback): void {
-  callback && callback(new KeyManagerActionError('importIdentity', message));
+  callback && callback(new WorkerJobError('importIdentity', message));
 }
 
 export function importIdentity(

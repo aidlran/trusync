@@ -1,14 +1,14 @@
 import * as nacl from 'tweetnacl';
 import { concatenateByteArray, derivedShaB58 } from '../crypto/index.js';
-import { KeyManagerError } from '../keys/shared/errors/key-manager.error.js';
-import { KeyManagerActionError } from '../keys/shared/errors/key-manager-action.error.js';
+import { TrusyncError } from '../error/trusync-error.js';
+import { WorkerJobError } from '../error/worker-job-error.js';
+import { create, get, put } from '../indexeddb/indexeddb.js';
 import type {
   GenerateIdentityResult,
   InitSessionResult,
   UseSessionResult,
-} from '../keys/shared/interfaces/payloads/index.js';
-import type { Action, Job } from '../keys/shared/types/index.js';
-import { create, get, put } from '../keys/worker/indexeddb.js';
+} from './interfaces/payloads/index.js';
+import type { Action, Job } from './types/index.js';
 
 // TODO: move and optimise these interfaces
 
@@ -109,7 +109,7 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
 
 self.postMessage({ action: 'workerReady' });
 
-function errorResponse(error: string, action?: Action, jobID?: number): KeyManagerError {
+function errorResponse(error: string, action?: Action, jobID?: number): TrusyncError {
   self.postMessage({
     action,
     error,
@@ -118,9 +118,9 @@ function errorResponse(error: string, action?: Action, jobID?: number): KeyManag
   });
 
   if (action) {
-    return new KeyManagerActionError(action, error);
+    return new WorkerJobError(action, error);
   } else {
-    return new KeyManagerError(error);
+    return new TrusyncError(error);
   }
 }
 

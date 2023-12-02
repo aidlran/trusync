@@ -1,11 +1,12 @@
 import { base64 } from '../crypto/encode/base.js';
 import { sha256 } from '../crypto/hash/sha256.js';
-import type { Hash } from '../storage/interfaces/hash.js';
+import type { Hash } from '../channel/interfaces/hash.js';
 import type { Channel } from '../channel/channel.js';
 
 export class Data {
   constructor(private readonly channels: Channel[]) {}
 
+  /** @deprecated Implement in 'crypto' module. */
   private async hash(payload: string): Promise<Hash> {
     return {
       algorithm: 'sha256',
@@ -13,6 +14,7 @@ export class Data {
     };
   }
 
+  /** @deprecated Implement in 'node'/'channel' module. */
   async get(hash: Hash): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       void Promise.allSettled<Promise<void>>(
@@ -38,7 +40,7 @@ export class Data {
     });
   }
 
-  /** @throws {PromiseSettledResult<void>[]} */
+  /** @deprecated Implement in 'node'/'channel' module. */
   async put(payload: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
@@ -59,15 +61,17 @@ export class Data {
     return hash;
   }
 
+  /** @deprecated Implement in 'node'/'channel' module. */
   getJSON<T>(hash: Hash): Promise<T> {
     return this.get(hash).then((payload) => JSON.parse(payload) as T);
   }
 
-  /** @throws {PromiseSettledResult<void>[]} */
+  /** @deprecated Implement in 'node'/'channel' module. */
   async putJSON<T>(payload: T): Promise<Hash> {
     return this.put(JSON.stringify(payload), 'application/json');
   }
 
+  /** @deprecated Implement in 'node'/'channel' module. */
   getNamed(name: string): Promise<string> {
     return new Promise<string>((resolve, reject) => {
       void Promise.allSettled<Promise<void>>(
@@ -95,7 +99,7 @@ export class Data {
     });
   }
 
-  /** @throws {PromiseSettledResult<void>[]} */
+  /** @deprecated Implement in 'node'/'channel' module. */
   async putNamed(payload: string, name: string, mediaType = 'text/plain'): Promise<Hash> {
     const hash = await this.hash(payload);
     const results = await Promise.allSettled(
@@ -117,11 +121,12 @@ export class Data {
     return hash;
   }
 
+  /** @deprecated Implement in 'node'/'channel' module. */
   getNamedJSON<T>(name: string): Promise<T> {
     return this.getNamed(name).then((payload) => JSON.parse(payload) as T);
   }
 
-  /** @throws {PromiseSettledResult<void>[]} */
+  /** @deprecated Implement in 'node'/'channel' module. */
   putNamedJSON(payload: unknown, name: string): Promise<Hash> {
     return this.putNamed(JSON.stringify(payload), name, 'application/json');
   }

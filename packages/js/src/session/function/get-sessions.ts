@@ -1,4 +1,4 @@
-import { getAll, type Session as DBSession } from '../../keys/worker/indexeddb.js';
+import { getAll, type Session as DBSession } from '../../indexeddb/indexeddb.js';
 import type { Session, AllSessionsObservable } from '../types.js';
 
 // TODO: refactor/improve architecture

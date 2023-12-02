@@ -1,5 +1,5 @@
-import type { Request } from '../keys/shared/types/request.js';
-import type { Result } from '../keys/shared/types/result.js';
+import type { Request } from './types/request.js';
+import type { Result } from './types/result.js';
 import { CLUSTER_SIZE_DEFAULT } from './worker-defaults.js';
 import type {
   JobCallback,

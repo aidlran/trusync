@@ -43,7 +43,7 @@ export function importIdentity(
         } else {
           return {
             active: true,
-            identities: new Set(address),
+            identities: new Set([address]),
           };
         }
       });

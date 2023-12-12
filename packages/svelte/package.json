@@ -38,7 +38,7 @@
   "devDependencies": {
     "@playwright/test": "^1.40.1",
     "@sveltejs/adapter-auto": "^2.1.1",
-    "@sveltejs/kit": "^1.27.6",
+    "@sveltejs/kit": "^1.29.1",
     "@sveltejs/package": "^2.2.3",
     "concurrently": "^8.2.2",
     "publint": "^0.2.6",

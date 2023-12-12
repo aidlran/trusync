@@ -49,12 +49,12 @@
     "tweetnacl": "1.0.3"
   },
   "devDependencies": {
-    "@vitest/coverage-v8": "^1.0.1",
-    "@vitest/web-worker": "^1.0.1",
+    "@vitest/coverage-v8": "^1.0.4",
+    "@vitest/web-worker": "^1.0.4",
     "fake-indexeddb": "^5.0.1",
     "happy-dom": "^12.10.3",
     "typescript": "~5.3.3",
-    "vite": "^5.0.6",
-    "vitest": "^1.0.1"
+    "vite": "^5.0.8",
+    "vitest": "^1.0.4"
   }
 }

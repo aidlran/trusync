@@ -18,6 +18,8 @@
     "lint:js": "eslint packages/js",
     "lint:svelte": "eslint packages/svelte",
     "start": "conc -kn js,svelte \"npm start -w packages/js\" \"npm start -w packages/svelte\"",
+    "start:js": "npm start --w packages/js",
+    "start:svelte": "npm start --w packages/svelte",
     "test": "npm run test --workspaces",
     "test:js": "npm run test -w packages/js",
     "test:svelte": "npm run test -w packages/svelte"

@@ -37,9 +37,10 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.40.1",
-    "@sveltejs/adapter-auto": "^2.1.1",
-    "@sveltejs/kit": "^1.29.1",
+    "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/kit": "^2.0.0",
     "@sveltejs/package": "^2.2.3",
+    "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "concurrently": "^8.2.2",
     "publint": "^0.2.6",
     "svelte": "^4.2.8",
@@ -47,8 +48,8 @@
     "trusync": "file:../js",
     "tslib": "^2.6.2",
     "typescript": "~5.3.3",
-    "vite": "^4.5.1",
-    "vitest": "^0.34.6"
+    "vite": "^5.0.9",
+    "vitest": "^1.0.4"
   },
   "svelte": "./dist/index.js",
   "types": "./dist/index.d.ts",

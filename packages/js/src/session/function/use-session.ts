@@ -51,14 +51,14 @@ export function useSession(
 
           if (ok) {
             for (const address of iterationImportedAddresses) {
-              ok = allImportedAddresses.has(address as string);
+              ok = allImportedAddresses.has(address);
               if (!ok) break;
             }
           }
 
           if (!ok) {
             for (const address of iterationImportedAddresses) {
-              allImportedAddresses.add(address as string);
+              allImportedAddresses.add(address);
             }
           }
         }

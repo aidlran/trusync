@@ -4,9 +4,7 @@
     "module": "Node16",
     "moduleResolution": "Node16",
     "outDir": "./dist",
-    "target": "ES2015",
-    "verbatimModuleSyntax": true
+    "target": "ES2020"
   },
-  "include": ["bin", "src"],
-  "exclude": ["src/**/*.test.ts"]
+  "include": ["bin", "src"]
 }

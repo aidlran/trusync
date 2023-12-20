@@ -1,4 +1,4 @@
-import type { JobMetadataMixin } from '../interfaces/mixins/job-metadata.mixin.js';
+import type { JobMetadataMixin } from '../interface/mixin/job-metadata.js';
 import type { Action } from './action.js';
 import type { Result } from './result.js';
 

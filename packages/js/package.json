@@ -39,7 +39,7 @@
     }
   },
   "scripts": {
-    "build": "tsc --build --project tsconfig.build.json",
+    "build": "tsc --project tsconfig.build.json",
     "lc": "echo truSync JS: $(find bin src -type f ! -name *.test.* -exec cat {} \\; | wc -l) lines",
     "start": "tsc --watch --preserveWatchOutput --project tsconfig.build.json",
     "test": "vitest run"

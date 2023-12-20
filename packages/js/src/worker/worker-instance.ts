@@ -44,6 +44,7 @@ export function workerInstance(workerConstructor: () => Worker): WorkerInstanceC
       function post() {
         jobCallbacks[++jobCounter] = callback as JobCallback | undefined;
         // TODO: don't use spread operator
+        // TODO: send multiple jobs per message
         worker.postMessage({ ...request, jobID: jobCounter });
       }
       if (readyCallbacks) readyCallbacks.add(post);

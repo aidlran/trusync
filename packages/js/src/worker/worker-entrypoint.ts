@@ -7,7 +7,7 @@ import type {
   GenerateIdentityResult,
   InitSessionResult,
   UseSessionResult,
-} from './interfaces/payloads/index.js';
+} from './interface/payload/index.js';
 import type { Action, Job } from './types/index.js';
 
 // TODO: move and optimise these interfaces

@@ -1,5 +1,5 @@
-import type * as Request from '../interfaces/payloads/requests/index.js';
-import type { ActionMixin } from '../interfaces/mixins/action.mixin.js';
+import type * as Request from '../interface/payload/index.js';
+import type { ActionMixin } from '../interface/mixin/action.js';
 import type { Payload } from './payload.js';
 
 /** Discriminated union that defines the request payloads for each action. */

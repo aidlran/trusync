@@ -1,4 +1,4 @@
-import type { ActionMixin } from '../interfaces/mixins/action.mixin.js';
+import type { ActionMixin } from '../interface/mixin/action.js';
 import type { Action } from './action.js';
 import type { ResultPayload } from './result-payload.js';
 

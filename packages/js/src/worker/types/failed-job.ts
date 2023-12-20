@@ -1,5 +1,5 @@
-import type { ActionMixin } from '../interfaces/mixins/action.mixin.js';
-import type { JobMetadataMixin } from '../interfaces/mixins/job-metadata.mixin.js';
+import type { ActionMixin } from '../interface/mixin/action.js';
+import type { JobMetadataMixin } from '../interface/mixin/job-metadata.js';
 import type { Action } from './action.js';
 
 export type FailedJob<A extends Action> = ActionMixin<A> &

@@ -1,5 +1,5 @@
-import type * as Result from '../interfaces/payloads/results/index.js';
-import type { ActionMixin } from '../interfaces/mixins/action.mixin.js';
+import type * as Result from '../interface/payload/index.js';
+import type { ActionMixin } from '../interface/mixin/action.js';
 import type { Payload } from './payload.js';
 
 /** Discriminated union that defines the result payloads for each action. */

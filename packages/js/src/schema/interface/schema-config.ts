@@ -1,3 +1,4 @@
-// TODO: empty config interface is a placeholder
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface SchemaConfig {}
+export interface SchemaConfig {
+  /** The name of the named node this schema references. */
+  named?: string;
+}

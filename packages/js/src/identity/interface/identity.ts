@@ -1,7 +1,7 @@
-import type { Address } from '../../crypto/address/types.js';
+import type { Address, AddressType } from '../../crypto/address/types.js';
 
 export interface Identity {
-  address: Address;
+  address: Address<AddressType>;
   encrypt: {
     publicKey: Uint8Array;
     type: number;

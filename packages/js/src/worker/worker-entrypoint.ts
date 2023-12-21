@@ -90,7 +90,7 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
           // TODO: may be deprecated, we'll just autosave
           return saveSession(event.data);
         case 'session.create':
-          return createSession(event.data);
+          return createSession(event.data.payload);
         case 'useSession':
           // TODO: refactor job type to "session.use"
           return useSession(event.data);

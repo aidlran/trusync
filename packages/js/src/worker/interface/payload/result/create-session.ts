@@ -1,1 +1,3 @@
-export interface CreateSessionResult {}
+export interface CreateSessionResult {
+  mnemonic: string;
+}

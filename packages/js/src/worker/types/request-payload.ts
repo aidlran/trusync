@@ -12,4 +12,5 @@ export type RequestPayload =
   | Payload<'forgetIdentity', Request.ForgetIdentityRequest>
   | Payload<'importIdentity', Request.ImportIdentityRequest>
   | Payload<'initSession', Request.InitSessionRequest>
+  | Payload<'session.create', Request.CreateSessionRequest>
   | Payload<'useSession', Request.UseSessionRequest>;

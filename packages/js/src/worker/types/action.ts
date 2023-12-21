@@ -3,7 +3,8 @@ export type Action =
   | 'forgetIdentity'
   | 'generateIdentity'
   | 'importIdentity'
-  | 'initSession'
+  | 'initSession' // TODO: may be deprecated by "session.create"
   | 'saveSession'
+  | 'session.create'
   | 'useSession'
   | 'workerReady';

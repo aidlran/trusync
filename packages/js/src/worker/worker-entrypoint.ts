@@ -8,6 +8,7 @@ import type {
   InitSessionResult,
   UseSessionResult,
 } from './interface/payload/index.js';
+import { create as createSession } from './jobs/session/create.js';
 import type { Action, Job } from './types/index.js';
 
 // TODO: move and optimise these interfaces
@@ -68,6 +69,9 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
     throw errorResponse('No action was provided.', action, jobID);
   }
 
+  // TODO: pass in only request payload to function
+  //       wrap in try catch
+
   try {
     const result = await (() => {
       switch (event.data.action) {
@@ -80,10 +84,15 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
         case 'importIdentity':
           return importIdentity(event.data);
         case 'initSession':
+          // TODO: may be deprecated by "session.create"
           return initSession(event.data);
         case 'saveSession':
+          // TODO: may be deprecated, we'll just autosave
           return saveSession(event.data);
+        case 'session.create':
+          return createSession(event.data);
         case 'useSession':
+          // TODO: refactor job type to "session.use"
           return useSession(event.data);
         default:
           throw errorResponse('This action is not supported.', action, jobID);
@@ -236,6 +245,7 @@ async function importIdentity(job: Job<'importIdentity'>): Promise<void> {
   });
 }
 
+// TODO: may be deprecated by `createSession()`
 async function initSession(job: Job<'initSession'>): Promise<InitSessionResult> {
   // TODO: move crypto functions to `src/crypto`
   const secretKey = await crypto.subtle.importKey(

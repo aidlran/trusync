@@ -2,9 +2,9 @@ import type { CreateSessionRequest } from '../../worker/interface/payload/index.
 import type { WorkerDispatch } from '../../worker/worker-dispatch.js';
 import type { JobCallback } from '../../worker/worker-instance.js';
 
-export const constructCreateSession = ({ postToOne }: Pick<WorkerDispatch, 'postToOne'>) => {
+export const constructCreateSession = <T>({ postToOne }: Pick<WorkerDispatch, 'postToOne'>) => {
   const createSession = (
-    options: CreateSessionRequest,
+    options: CreateSessionRequest<T>,
     callback?: (mnemonic: string) => unknown,
   ) => {
     let handler: JobCallback<'session.create'> | undefined;
@@ -12,7 +12,7 @@ export const constructCreateSession = ({ postToOne }: Pick<WorkerDispatch, 'post
     postToOne({ action: 'session.create', payload: options }, handler);
   };
 
-  createSession.asPromise = (options: CreateSessionRequest) => {
+  createSession.asPromise = (options: CreateSessionRequest<T>) => {
     return new Promise<string>((resolve) => createSession(options, resolve));
   };
 

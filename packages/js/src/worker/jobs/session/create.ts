@@ -3,7 +3,7 @@ import type { CreateSessionRequest, CreateSessionResult } from '../../interface/
 
 export const create = async (request: CreateSessionRequest): Promise<CreateSessionResult> => {
   const mnemonic = await entropyToMnemonic(crypto.getRandomValues(new Uint8Array(16)));
-  const seed = await mnemonicToSeed(mnemonic, request.passphrase ?? '');
+  const seed = await mnemonicToSeed(mnemonic, request.passphrase);
 
   return { mnemonic };
 };

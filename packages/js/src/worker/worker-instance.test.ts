@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './worker-instance.js';
 
-test.todo('worker instance');
+describe.todo('worker instance');

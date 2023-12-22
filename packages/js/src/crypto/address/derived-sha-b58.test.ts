@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './derived-sha-b58.js';
 
-test.todo('derived SHA B58');
+describe.todo('derived SHA B58');

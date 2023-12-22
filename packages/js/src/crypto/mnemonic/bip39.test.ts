@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './bip39.js';
 
-test.todo('BIP39');
+describe.todo('BIP39');

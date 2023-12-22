@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './buffer-utils.js';
 
-test.todo('buffer utilities');
+describe.todo('buffer utilities');

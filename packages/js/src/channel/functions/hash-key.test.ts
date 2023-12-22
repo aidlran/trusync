@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './hash-key.js';
 
-test.todo('hash key');
+describe.todo('hash key');

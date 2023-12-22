@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './worker-dispatch.js';
 
-test.todo('worker dispatch');
+describe.todo('worker dispatch');

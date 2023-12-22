@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto';
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './indexeddb.js';
 
-test.todo('indexeddb');
+describe.todo('indexeddb');

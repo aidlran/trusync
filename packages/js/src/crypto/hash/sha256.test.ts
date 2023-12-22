@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './sha256.js';
 
-test.todo('SHA-256');
+describe.todo('SHA-256');

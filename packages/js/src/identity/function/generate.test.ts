@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './generate.js';
 
-test.todo('generate identity');
+describe.todo('generate identity');

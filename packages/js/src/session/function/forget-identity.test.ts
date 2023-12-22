@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './forget-identity.js';
 
-test.todo('forget identity');
+describe.todo('forget identity');

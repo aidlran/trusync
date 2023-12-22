@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './clear-session.js';
 
-test.todo('clear session');
+describe.todo('clear session');

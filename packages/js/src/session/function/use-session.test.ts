@@ -1,4 +1,4 @@
-import { test } from 'vitest';
+import { describe } from 'vitest';
 import './use-session';
 
-test.todo('use session');
+describe.todo('use session');

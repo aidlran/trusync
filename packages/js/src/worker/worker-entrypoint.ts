@@ -1,7 +1,5 @@
 import * as nacl from 'tweetnacl';
 import { concatenateByteArray, derivedShaB58 } from '../crypto/index.js';
-import { TrusyncError } from '../error/trusync-error.js';
-import { WorkerJobError } from '../error/worker-job-error.js';
 import { create, get, put } from '../indexeddb/indexeddb.js';
 import type {
   GenerateIdentityResult,
@@ -62,82 +60,69 @@ const importedIdentities = new Array<Identity>();
 
 let session: LiveSession | undefined;
 
-self.onmessage = async (event: MessageEvent<Job<Action>>) => {
-  const { action, jobID } = event.data;
-
-  if (!action) {
-    throw errorResponse('No action was provided.', action, jobID);
-  }
-
-  // TODO: pass in only request payload to function
-  //       wrap in try catch
-
+self.onmessage = async (event: MessageEvent<Job<Action> | undefined>) => {
   try {
-    const result = await (() => {
-      switch (event.data.action) {
-        case 'clearSession':
-          return clearSession();
-        case 'forgetIdentity':
-          // TODO: rename job action to "identity.forget"
-          //       potentially deprecated
-          return forgetIdentity(event.data);
-        case 'generateIdentity':
-          // TODO: rename job action to "identity.generate"
-          //       potentially deprecated
-          return generateIdentity();
-        case 'importIdentity':
-          // TODO: rename job action to "identity.import"
-          //       potentially deprecated
-          return importIdentity(event.data);
-        case 'initSession':
-          // TODO: may be deprecated by "session.create"
-          return initSession(event.data);
-        case 'saveSession':
-          // TODO: may be deprecated, we'll just autosave
-          return saveSession(event.data);
-        case 'session.create':
-          return createSession(event.data.payload);
-        case 'useSession':
-          // TODO: rename job action to "session.use"
-          return useSession(event.data);
-        default:
-          throw errorResponse('This action is not supported.', action, jobID);
-      }
-    })();
+    if (!event.data?.action) {
+      throw TypeError('No action provided');
+    }
 
+    let resultPayload: unknown;
+
+    switch (event.data.action) {
+      case 'clearSession':
+        resultPayload = clearSession();
+        break;
+      case 'forgetIdentity':
+        // TODO: rename job action to "identity.forget"
+        //       potentially deprecated
+        resultPayload = forgetIdentity(event.data.payload);
+        break;
+      case 'generateIdentity':
+        // TODO: rename job action to "identity.generate"
+        //       potentially deprecated
+        resultPayload = await generateIdentity();
+        break;
+      case 'importIdentity':
+        // TODO: rename job action to "identity.import"
+        //       potentially deprecated
+        resultPayload = await importIdentity(event.data.payload);
+        break;
+      case 'initSession':
+        // TODO: may be deprecated by "session.create"
+        resultPayload = await initSession(event.data.payload);
+        break;
+      case 'saveSession':
+        // TODO: may be deprecated, we'll just autosave
+        resultPayload = await saveSession();
+        break;
+      case 'session.create':
+        resultPayload = await createSession(event.data.payload);
+        break;
+      case 'useSession':
+        // TODO: rename job action to "session.use"
+        resultPayload = await useSession(event.data.payload);
+        break;
+      default:
+        throw TypeError('Action not supported');
+    }
     self.postMessage({
-      action,
-      jobID,
+      action: event.data?.action,
+      jobID: event.data?.jobID,
       ok: true,
-      payload: result,
+      payload: resultPayload,
     });
   } catch (error) {
     self.postMessage({
-      action,
-      error: 'Unknown error',
-      jobID,
+      action: event.data?.action,
+      jobID: event.data?.jobID,
       ok: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
     throw error;
   }
 };
 
 self.postMessage({ action: 'workerReady' });
-
-function errorResponse(error: string, action?: Action, jobID?: number): TrusyncError {
-  self.postMessage({
-    action,
-    error,
-    jobID,
-    ok: false,
-  });
-
-  if (action) {
-    return new WorkerJobError(action, error);
-  } else {
-    return new TrusyncError(error);
-  }
-}
 
 // Utility functions
 
@@ -186,10 +171,8 @@ function clearSession(): void {
   session = undefined;
 }
 
-function forgetIdentity(job: Job<'forgetIdentity'>): void {
-  const foundIndex = importedIdentities.findIndex(
-    (value) => value.address.value === job.payload.address,
-  );
+function forgetIdentity(job: Job<'forgetIdentity'>['payload']): void {
+  const foundIndex = importedIdentities.findIndex((value) => value.address.value === job.address);
   if (foundIndex > -1) {
     importedIdentities.splice(foundIndex, 1);
   }
@@ -218,26 +201,26 @@ async function generateIdentity(): Promise<GenerateIdentityResult> {
   };
 }
 
-async function importIdentity(job: Job<'importIdentity'>): Promise<void> {
-  if (importedIdentities.find((identity) => identity.address.value === job.payload.address)) {
-    throw errorResponse(`Address '${job.payload.address}' is already imported.`);
+async function importIdentity(job: Job<'importIdentity'>['payload']): Promise<void> {
+  if (importedIdentities.find((identity) => identity.address.value === job.address)) {
+    throw Error(`Address '${job.address}' is already imported.`);
   }
 
   // TODO: move crypto functions to `src/crypto`
   // TODO: replace with WebCrypto implementation
-  const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(job.payload.secret);
-  const signingKeyPair = nacl.sign.keyPair.fromSeed(job.payload.secret);
+  const encryptionKeyPair = nacl.box.keyPair.fromSecretKey(job.secret);
+  const signingKeyPair = nacl.sign.keyPair.fromSeed(job.secret);
   const address = await derivedShaB58(
     concatenateByteArray(encryptionKeyPair.publicKey, signingKeyPair.publicKey),
   );
 
-  if (address.value !== job.payload.address) {
-    throw errorResponse('Invalid secret', job.action, job.jobID);
+  if (address.value !== job.address) {
+    throw Error('Invalid secret');
   }
 
   importedIdentities.push({
     address,
-    secret: job.payload.secret,
+    secret: job.secret,
     encrypt: {
       publicKey: encryptionKeyPair.publicKey,
       secretKey: encryptionKeyPair.secretKey,
@@ -252,39 +235,31 @@ async function importIdentity(job: Job<'importIdentity'>): Promise<void> {
 }
 
 // TODO: may be deprecated by `createSession()`
-async function initSession(job: Job<'initSession'>): Promise<InitSessionResult> {
+async function initSession(job: Job<'initSession'>['payload']): Promise<InitSessionResult> {
   // TODO: move crypto functions to `src/crypto`
-  const secretKey = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(job.payload.pin),
-    'PBKDF2',
-    false,
-    ['deriveBits'],
-  );
+  const secretKey = await crypto.subtle.importKey('raw', encoder.encode(job.pin), 'PBKDF2', false, [
+    'deriveBits',
+  ]);
   const { salt, nonce, payload } = await encryptSession(secretKey);
   const id = await create('session', {
     salt,
     nonce,
     payload,
-    metadata: job.payload.metadata,
+    metadata: job.metadata,
   });
   session = {
     id,
     secretKey,
-    metadata: job.payload.metadata,
+    metadata: job.metadata,
   };
   return {
     sessionID: id as number,
   };
 }
 
-async function saveSession(job: Job<'saveSession'>): Promise<void> {
+async function saveSession(): Promise<void> {
   if (!session) {
-    throw errorResponse(
-      'No session active. `initSession` or `useSession` must be called first.',
-      job.action,
-      job.jobID,
-    );
+    throw Error('No active session');
   }
   const { salt, nonce, payload } = await encryptSession(session.secretKey);
   await put('session', {
@@ -296,22 +271,14 @@ async function saveSession(job: Job<'saveSession'>): Promise<void> {
   });
 }
 
-async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
-  const { id, salt, nonce, payload, metadata } = await get('session', job.payload.sessionID).catch(
-    () => {
-      throw errorResponse('Could not get session.', job.action, job.jobID);
-    },
-  );
+async function useSession(job: Job<'useSession'>['payload']): Promise<UseSessionResult> {
+  const { id, salt, nonce, payload, metadata } = await get('session', job.sessionID);
 
   // TODO: move crypto functions to `src/crypto`
 
-  const secretKey = await crypto.subtle.importKey(
-    'raw',
-    encoder.encode(job.payload.pin),
-    'PBKDF2',
-    false,
-    ['deriveBits'],
-  );
+  const secretKey = await crypto.subtle.importKey('raw', encoder.encode(job.pin), 'PBKDF2', false, [
+    'deriveBits',
+  ]);
 
   const encryptionKey = await crypto.subtle.deriveBits(
     {
@@ -331,7 +298,7 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
   );
 
   if (!message) {
-    throw errorResponse('Invalid pin.', job.action, job.jobID);
+    throw Error('Invalid passphrase');
   }
 
   const serialised = JSON.parse(new TextDecoder().decode(message)) as SerialisedSession<
@@ -351,7 +318,7 @@ async function useSession(job: Job<'useSession'>): Promise<UseSessionResult> {
         );
 
         if (address.value !== identity.address) {
-          throw errorResponse('Invalid secret', job.action, job.jobID);
+          throw Error('Invalid secret');
         }
 
         identities.push(address.value);

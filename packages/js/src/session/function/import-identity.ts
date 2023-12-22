@@ -1,12 +1,7 @@
-import { WorkerJobError } from '../../error/worker-job-error.js';
 import type { WorkerDispatch } from '../../worker/worker-dispatch.js';
 import type { ActiveSessionObservable, AllSessionsObservable } from '../types.js';
 
-export type ImportIdentityCallback = (error?: WorkerJobError<'importIdentity'>) => unknown;
-
-function error(message: string, callback?: ImportIdentityCallback): void {
-  callback && callback(new WorkerJobError('importIdentity', message));
-}
+export type ImportIdentityCallback = (error?: Error) => unknown;
 
 export function importIdentity(
   workerDispatch: Pick<WorkerDispatch, 'postToAll' | 'postToOne'>,
@@ -18,7 +13,8 @@ export function importIdentity(
   callback?: ImportIdentityCallback,
 ) {
   if (activeSessionObservable.get()?.identities.has(address)) {
-    return error(`Address '${address}' is already imported.`, callback);
+    if (callback) callback(new Error(`Address '${address}' already imported`));
+    return;
   }
   workerDispatch.postToAll(
     {
@@ -31,7 +27,7 @@ export function importIdentity(
     (results) => {
       for (const result of results) {
         if (!result.ok) {
-          forgetIdentity(address, () => error(result.error ?? 'Unknown error.', callback));
+          forgetIdentity(address, () => callback && callback(new Error(result.error)));
           return;
         }
       }

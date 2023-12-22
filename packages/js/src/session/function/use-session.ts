@@ -1,4 +1,3 @@
-import { WorkerJobError } from '../../error/worker-job-error.js';
 import type { WorkerDispatch } from '../../worker/worker-dispatch.js';
 import type {
   ActiveSession,
@@ -8,7 +7,7 @@ import type {
   InactiveSession,
 } from '../types.js';
 
-export type UseSessionCallback = (error?: WorkerJobError<'useSession'>) => unknown;
+export type UseSessionCallback = (error?: Error) => unknown;
 
 export function useSession(
   workerDispatch: Pick<WorkerDispatch, 'postToAll'>,
@@ -94,7 +93,7 @@ export function useSession(
         clearSession();
         // TODO: return more accurate error if pin incorrect
         if (callback) {
-          callback(new WorkerJobError('useSession', 'One or more workers were out of sync.'));
+          callback(new Error('One or more workers were out of sync.'));
         }
       }
     },

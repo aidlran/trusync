@@ -6,14 +6,10 @@ import type { Payload } from './payload.js';
 export type ResultPayload =
   // Have no payload
   | ActionMixin<
-      | 'clearSession'
-      | 'forgetIdentity'
-      | 'importIdentity'
-      | 'saveSession'
-      | 'session.create'
-      | 'workerReady'
+      'clearSession' | 'forgetIdentity' | 'importIdentity' | 'saveSession' | 'workerReady'
     >
   // Have a payload
   | Payload<'generateIdentity', Result.GenerateIdentityResult>
   | Payload<'initSession', Result.InitSessionResult>
+  | Payload<'session.create', Result.CreateSessionResult>
   | Payload<'useSession', Result.UseSessionResult>;

@@ -37,7 +37,7 @@ export async function entropyToMnemonic(entropy: Uint8Array): Promise<string> {
     mnemonicInt >>= 11n;
   }
 
-  return mnemonicString;
+  return mnemonicString.trimEnd();
 }
 
 export async function mnemonicToSeed(mnemonic: string, passphrase = ''): Promise<ArrayBuffer> {

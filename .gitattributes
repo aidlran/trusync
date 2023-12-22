@@ -1,3 +1,2 @@
 .eslintrc.* linguist-vendored
 *.config.js linguist-vendored
-bip39*.json linguist-vendored

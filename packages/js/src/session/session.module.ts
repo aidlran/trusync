@@ -1,6 +1,7 @@
 import { createModule } from '../module/create-module.js';
 import { Observable, type ObservableCallback } from '../observable/observable.js';
 import { workerModule } from '../worker/worker.module.js';
+import { constructCreateSession } from './function/create-session.js';
 import * as Functions from './function/index.js';
 import type { ActiveSession, Sessions } from './types.js';
 
@@ -14,6 +15,8 @@ export const sessionModule = createModule((appID) => {
     clearSession(callback?: () => unknown) {
       return Functions.clearSession(WORKER_MODULE, ALL_SESSIONS, ACTIVE_SESSION, callback);
     },
+
+    createSession: constructCreateSession(WORKER_MODULE),
 
     forgetIdentity(address: string, callback?: () => unknown) {
       return Functions.forgetIdentity(

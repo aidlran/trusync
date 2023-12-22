@@ -78,10 +78,16 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
         case 'clearSession':
           return clearSession();
         case 'forgetIdentity':
+          // TODO: rename job action to "identity.forget"
+          //       potentially deprecated
           return forgetIdentity(event.data);
         case 'generateIdentity':
+          // TODO: rename job action to "identity.generate"
+          //       potentially deprecated
           return generateIdentity();
         case 'importIdentity':
+          // TODO: rename job action to "identity.import"
+          //       potentially deprecated
           return importIdentity(event.data);
         case 'initSession':
           // TODO: may be deprecated by "session.create"
@@ -92,7 +98,7 @@ self.onmessage = async (event: MessageEvent<Job<Action>>) => {
         case 'session.create':
           return createSession(event.data.payload);
         case 'useSession':
-          // TODO: refactor job type to "session.use"
+          // TODO: rename job action to "session.use"
           return useSession(event.data);
         default:
           throw errorResponse('This action is not supported.', action, jobID);

@@ -4,12 +4,6 @@ import type { Payload } from './payload.js';
 
 /** Discriminated union that defines the result payloads for each action. */
 export type ResultPayload =
-  // Have no payload
-  | ActionMixin<
-      'clearSession' | 'forgetIdentity' | 'importIdentity' | 'saveSession' | 'workerReady'
-    >
-  // Have a payload
-  | Payload<'generateIdentity', Result.GenerateIdentityResult>
-  | Payload<'initSession', Result.InitSessionResult>
+  | ActionMixin<'session.clear'>
   | Payload<'session.create', Result.CreateSessionResult>
-  | Payload<'useSession', Result.UseSessionResult>;
+  | Payload<'session.unlock', Result.UnlockSessionResult>;

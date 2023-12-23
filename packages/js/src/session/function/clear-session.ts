@@ -7,12 +7,11 @@ export function clearSession(
   activeSessionObservable: ActiveSessionObservable,
   callback?: () => unknown,
 ): void {
-  workerDispatch.postToAll({ action: 'clearSession' }, () => {
+  workerDispatch.postToAll({ action: 'session.clear' }, () => {
     if (activeSessionObservable.get()) {
       activeSessionObservable.update((activeSession) => {
         const session = activeSession as Session;
         session.active = false;
-        delete session.identities;
         sessionsObservable.emit();
         return undefined;
       });

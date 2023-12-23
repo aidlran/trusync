@@ -45,7 +45,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@bitcoinerlab/secp256k1": "^1.0.5",
     "base-x": "4.0.0",
+    "bip32": "^4.0.0",
+    "buffer": "^6.0.3",
     "tweetnacl": "1.0.3"
   },
   "devDependencies": {

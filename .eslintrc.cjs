@@ -49,7 +49,9 @@ module.exports = {
     {
       files: ['*.test.*'],
       rules: {
+        '@typescript-eslint/no-empty-function': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
+        '@typescript-eslint/no-unsafe-argument': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
         '@typescript-eslint/no-unsafe-return': 'off',
         'prefer-const': 'off',

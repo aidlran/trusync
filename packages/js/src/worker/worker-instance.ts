@@ -1,3 +1,4 @@
+import type { ActionMixin } from './interface/mixin/action.js';
 import type { Action, CompletedJob, Request, Result } from './types/index.js';
 
 export type PublicAction = Exclude<Action, 'workerReady'>;
@@ -26,7 +27,7 @@ export function workerInstance(workerConstructor: () => Worker): WorkerInstanceC
     const jobCallbacks: Record<number, JobCallback | undefined> = {};
     const worker = workerConstructor();
 
-    worker.onmessage = function (event: MessageEvent<CompletedJob<Action>>) {
+    worker.onmessage = (event: MessageEvent<CompletedJob<Action> | ActionMixin<'workerReady'>>) => {
       if (event.data.action === 'workerReady') {
         if (readyCallbacks) {
           for (const callback of readyCallbacks) {

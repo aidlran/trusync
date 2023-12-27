@@ -1,7 +1,7 @@
 import { createModule } from '../module/create-module.js';
 import { Observable, type ObservableCallback } from '../observable/observable.js';
 import { workerModule } from '../worker/worker.module.js';
-import { clearSession } from './function/clear-session.js';
+import { construct as constructClear } from './function/clear.js';
 import { constructCreateSession } from './function/create-session.js';
 import { getSessions } from './function/get-sessions.js';
 import { constructImportSession } from './function/import-session.js';
@@ -16,9 +16,7 @@ export const getSessionModule = <T = unknown>(appID?: string) => {
     const ACTIVE_SESSION = new Observable<ActiveSession | undefined>(undefined);
 
     const SESSION_MODULE = {
-      clearSession(callback?: () => unknown) {
-        return clearSession(WORKER_MODULE, ALL_SESSIONS, ACTIVE_SESSION, callback);
-      },
+      clear: constructClear(WORKER_MODULE, ALL_SESSIONS, ACTIVE_SESSION),
 
       create: constructCreateSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
 
@@ -29,6 +27,7 @@ export const getSessionModule = <T = unknown>(appID?: string) => {
       },
 
       import: constructImportSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
+
       load: constructLoadSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
 
       // TODO: simply expose a readonly version of the observable

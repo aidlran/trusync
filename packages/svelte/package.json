@@ -39,7 +39,7 @@
     "@playwright/test": "^1.40.1",
     "@sveltejs/adapter-auto": "^3.0.1",
     "@sveltejs/kit": "^2.0.6",
-    "@sveltejs/package": "^2.2.4",
+    "@sveltejs/package": "^2.2.5",
     "@sveltejs/vite-plugin-svelte": "^3.0.1",
     "concurrently": "^8.2.2",
     "publint": "^0.2.7",

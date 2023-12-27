@@ -1,13 +1,18 @@
 import type { WorkerDispatch } from '../../worker/worker-dispatch.js';
 import type { ActiveSessionObservable, Session, AllSessionsObservable } from '../types.js';
 
+export interface SessionClearFn {
+  (callback?: () => unknown): void;
+  asPromise(): Promise<void>;
+}
+
 export const construct = (
-  workerDispatch: Pick<WorkerDispatch, 'postToAll'>,
+  { postToAll }: Pick<WorkerDispatch, 'postToAll'>,
   sessionsObservable: AllSessionsObservable,
   activeSessionObservable: ActiveSessionObservable,
-) => {
-  const fn = (callback?: () => unknown): void => {
-    workerDispatch.postToAll({ action: 'session.clear' }, () => {
+): SessionClearFn => {
+  const fn: SessionClearFn = (callback) => {
+    postToAll({ action: 'session.clear' }, () => {
       if (activeSessionObservable.get()) {
         activeSessionObservable.update((activeSession) => {
           const session = activeSession as Session;
@@ -20,7 +25,7 @@ export const construct = (
     });
   };
 
-  fn.asPromise = () => new Promise<void>((resolve) => fn(resolve));
+  fn.asPromise = () => new Promise((resolve) => fn(resolve));
 
   return fn;
 };

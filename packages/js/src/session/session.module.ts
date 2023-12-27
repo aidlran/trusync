@@ -1,24 +1,43 @@
 import { createModule } from '../module/create-module.js';
 import { Observable, type ObservableCallback } from '../observable/observable.js';
+import type {
+  ImportSessionRequest,
+  ImportSessionResult,
+} from '../worker/interface/payload/index.js';
 import { workerModule } from '../worker/worker.module.js';
-import { construct as constructClear } from './function/clear.js';
-import { constructCreateSession } from './function/create-session.js';
+import { construct as constructClear, type SessionClearFn } from './function/clear.js';
+import { construct as constructCreate, type SessionCreateFn } from './function/create.js';
 import { getSessions } from './function/get-sessions.js';
-import { constructImportSession } from './function/import-session.js';
-import { constructLoadSession } from './function/load-session.js';
+import { construct as constructImport, type SessionImportFn } from './function/import.js';
+import { construct as constructLoad, type SessionLoadFn } from './function/load.js';
 import type { ActiveSession, AllSessions } from './types.js';
 
-export const getSessionModule = <T = unknown>(appID?: string) => {
+export interface SessionModule<T = unknown> {
+  clear: SessionClearFn;
+  create: SessionCreateFn<T>;
+  getSessions(callback?: (sessions: Readonly<AllSessions>) => unknown): void;
+  import: SessionImportFn<T>;
+  load: SessionLoadFn<T>;
+  /** @returns An unsubscribe function. */
+  onActiveSessionChange(callback: ObservableCallback<ActiveSession | undefined>): () => void;
+  /** @returns An unsubscribe function. */
+  onSessionsChange(callback: ObservableCallback<AllSessions>): () => void;
+}
+
+export const getSessionModule = <T = unknown>(appID?: string): SessionModule<T> => {
   return createModule((appID) => {
     const WORKER_MODULE = workerModule(appID);
 
     const ALL_SESSIONS = new Observable<AllSessions>({});
     const ACTIVE_SESSION = new Observable<ActiveSession | undefined>(undefined);
 
-    const SESSION_MODULE = {
-      clear: constructClear(WORKER_MODULE, ALL_SESSIONS, ACTIVE_SESSION),
+    const load = constructLoad<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS);
 
-      create: constructCreateSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
+    const SESSION_MODULE: SessionModule<T> = {
+      clear: constructClear(WORKER_MODULE, ALL_SESSIONS, ACTIVE_SESSION),
+      create: constructCreate<T>(WORKER_MODULE, load, ALL_SESSIONS),
+      import: constructImport<T>(WORKER_MODULE, load, ALL_SESSIONS),
+      load,
 
       getSessions(callback?: (sessions: Readonly<AllSessions>) => unknown): void {
         getSessions(ALL_SESSIONS, () => {
@@ -26,24 +45,10 @@ export const getSessionModule = <T = unknown>(appID?: string) => {
         });
       },
 
-      import: constructImportSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
-
-      load: constructLoadSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
-
-      // TODO: simply expose a readonly version of the observable
-
-      /** @returns An unsubscribe function. */
-      onActiveSessionChange(callback: ObservableCallback<ActiveSession | undefined>) {
-        return ACTIVE_SESSION.subscribe(callback);
-      },
-
-      /** @returns An unsubscribe function. */
-      onSessionsChange(callback: ObservableCallback<AllSessions>) {
-        return ALL_SESSIONS.subscribe(callback);
-      },
+      // TODO: simply expose a readonly version of the observables
+      onActiveSessionChange: (callback) => ACTIVE_SESSION.subscribe(callback),
+      onSessionsChange: (callback) => ALL_SESSIONS.subscribe(callback),
     };
-
-    indexedDB && SESSION_MODULE.getSessions();
 
     return SESSION_MODULE;
   })(appID);

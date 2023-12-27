@@ -2,47 +2,52 @@ import { beforeEach, describe, expect, it, test } from 'vitest';
 import { Observable } from '../../observable/observable.js';
 import type { PostToAllAction } from '../../worker/types/action.js';
 import type { Request } from '../../worker/types/request.js';
+import type { Result } from '../../worker/types/result.js';
 import type { WorkerPostMultiResultCallback } from '../../worker/worker-dispatch.js';
-import type { ActiveSession, ActiveSessionObservable, AllSessionsObservable } from '../types.js';
-import { construct } from './clear.js';
+import type { ActiveSessionObservable, AllSessionsObservable } from '../types.js';
+import { construct } from './load.js';
 
 const postToAll = <T extends PostToAllAction>(
   request: Request<T>,
   callback?: WorkerPostMultiResultCallback<T>,
 ) => {
-  if (request.action !== 'session.clear') {
+  if (request.action !== 'session.load') {
     throw new Error('Unexpected request action');
   }
   if (callback) {
-    callback([]);
+    const result: Result<'session.load'> = {
+      action: 'session.load',
+      ok: true,
+      payload: { id: (request as Request<'session.load'>).payload.id },
+    };
+    callback([result as Result<T>]);
   }
 };
 const allSessions: AllSessionsObservable = new Observable({});
 const activeSession = new Observable(undefined) as ActiveSessionObservable;
-const fn = construct({ postToAll }, allSessions, activeSession);
+const fn = construct({ postToAll }, activeSession, allSessions);
 
 it("doesn't use an unexpected request action", () => {
-  expect(fn).not.toThrow();
+  expect(() => fn(1, 'passphrase')).not.toThrow();
 });
 
-describe('clears the active session', () => {
+describe('sets the active session', () => {
   const checkResult = () => {
-    expect(allSessions.get()[1]).property('active').equals(false);
-    expect(activeSession.get()).toBeUndefined();
+    expect(allSessions.get()[1]).property('active').equals(true);
+    expect(activeSession.get()).property('id').equals(1);
   };
 
   beforeEach(() => {
-    const session: ActiveSession = { id: 1, active: true };
-    allSessions.update(() => ({ 1: session }));
-    activeSession.update(() => session);
+    allSessions.update(() => ({}));
+    activeSession.update(() => undefined);
   });
 
   test('callback', () => {
-    fn(checkResult);
+    fn(1, 'passphrase', checkResult);
   });
 
   test('asPromise', () => {
-    expect(fn.asPromise()).resolves;
+    expect(fn.asPromise(1, 'passphrase')).resolves;
     checkResult();
   });
 });

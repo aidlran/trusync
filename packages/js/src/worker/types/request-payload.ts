@@ -6,4 +6,5 @@ import type { Payload } from './payload.js';
 export type RequestPayload =
   | ActionMixin<'session.clear'>
   | Payload<'session.create', Request.CreateSessionRequest>
-  | Payload<'session.unlock', Request.UnlockSessionRequest>;
+  | Payload<'session.import', Request.ImportSessionRequest>
+  | Payload<'session.load', Request.LoadSessionRequest>;

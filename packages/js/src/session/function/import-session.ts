@@ -1,6 +1,5 @@
 import type {
-  CreateSessionRequest,
-  CreateSessionResult,
+  ImportSessionRequest,
   LoadSessionResult,
 } from '../../worker/interface/payload/index.js';
 import type { WorkerDispatch } from '../../worker/worker-dispatch.js';
@@ -11,18 +10,16 @@ import type {
   InactiveSession,
 } from '../types.js';
 
-export const constructCreateSession = <T>(
+export const constructImportSession = <T>(
   worker: WorkerDispatch,
   activeSessions: ActiveSessionObservable,
   allSessions: AllSessionsObservable,
 ) => {
-  const createSession = (
-    options: CreateSessionRequest<T>,
-    callback?: (result: CreateSessionResult & LoadSessionResult<T>) => unknown,
+  const importSession = (
+    options: ImportSessionRequest<T>,
+    callback?: (result: LoadSessionResult<T>) => unknown,
   ): void => {
-    worker.postToOne({ action: 'session.create', payload: options }, ({ payload }) => {
-      const mnemonic = payload.mnemonic;
-
+    worker.postToOne({ action: 'session.import', payload: options }, ({ payload }) => {
       const session: InactiveSession<T> = {
         id: payload.id,
         active: false,
@@ -52,21 +49,15 @@ export const constructCreateSession = <T>(
 
           activeSessions.update(() => session);
 
-          if (callback) {
-            callback({
-              id: payload.id,
-              metadata: payload.metadata as T,
-              mnemonic,
-            });
-          }
+          if (callback) callback(payload as LoadSessionResult<T>);
         },
       );
     });
   };
 
-  createSession.asPromise = (options: CreateSessionRequest<T>) => {
-    return new Promise<CreateSessionResult>((resolve) => createSession(options, resolve));
+  importSession.asPromise = (options: ImportSessionRequest<T>) => {
+    return new Promise<LoadSessionResult>((resolve) => importSession(options, resolve));
   };
 
-  return createSession;
+  return importSession;
 };

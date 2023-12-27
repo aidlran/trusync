@@ -4,7 +4,8 @@ import { workerModule } from '../worker/worker.module.js';
 import { clearSession } from './function/clear-session.js';
 import { constructCreateSession } from './function/create-session.js';
 import { getSessions } from './function/get-sessions.js';
-import { constructUnlockSession } from './function/unlock-session.js';
+import { constructImportSession } from './function/import-session.js';
+import { constructLoadSession } from './function/load-session.js';
 import type { ActiveSession, AllSessions } from './types.js';
 
 export const getSessionModule = <T = unknown>(appID?: string) => {
@@ -19,13 +20,16 @@ export const getSessionModule = <T = unknown>(appID?: string) => {
         return clearSession(WORKER_MODULE, ALL_SESSIONS, ACTIVE_SESSION, callback);
       },
 
-      createSession: constructCreateSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
+      create: constructCreateSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
 
       getSessions(callback?: (sessions: Readonly<AllSessions>) => unknown): void {
         getSessions(ALL_SESSIONS, () => {
           callback && callback(ALL_SESSIONS.get());
         });
       },
+
+      import: constructImportSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
+      load: constructLoadSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
 
       // TODO: simply expose a readonly version of the observable
 
@@ -38,8 +42,6 @@ export const getSessionModule = <T = unknown>(appID?: string) => {
       onSessionsChange(callback: ObservableCallback<AllSessions>) {
         return ALL_SESSIONS.subscribe(callback);
       },
-
-      unlockSession: constructUnlockSession<T>(WORKER_MODULE, ACTIVE_SESSION, ALL_SESSIONS),
     };
 
     indexedDB && SESSION_MODULE.getSessions();

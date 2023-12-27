@@ -1,10 +1,10 @@
 import { Buffer } from 'buffer';
-import { create } from './jobs/session/create.js';
+import { createSession } from './jobs/session/create.js';
 import { save } from './jobs/session/save.js';
-import { unlock } from './jobs/session/unlock.js';
+import { load } from './jobs/session/load.js';
 import type { Action, Job } from './types/index.js';
-import { activate } from './jobs/session/activate.js';
 import type { BIP32Interface } from 'bip32';
+import { importSession } from './jobs/session/import.js';
 
 // Polyfill Buffer for bip32 package
 globalThis.Buffer = Buffer;
@@ -25,13 +25,17 @@ self.onmessage = async (event: MessageEvent<Job<Action> | undefined>) => {
         throw Error('Not implemented');
       }
       case 'session.create': {
-        const { node, result } = await create(save, activate, event.data.payload);
-        session = node;
-        resultPayload = result;
+        resultPayload = await createSession(save, event.data.payload);
         break;
       }
-      case 'session.unlock': {
-        await unlock(activate, event.data.payload);
+      case 'session.import': {
+        resultPayload = await importSession(save, event.data.payload);
+        break;
+      }
+      case 'session.load': {
+        const { node, result } = await load(event.data.payload);
+        session = node;
+        resultPayload = result;
         break;
       }
       default: {

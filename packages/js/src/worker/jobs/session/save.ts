@@ -38,21 +38,19 @@ export const save = async (
     payload,
   );
 
-  const encryptedPayLoadBytes = new Uint8Array(encryptedPayload);
-
   if (id) {
     return put('session', {
       id,
       salt,
       nonce,
-      payload: encryptedPayLoadBytes,
+      payload: encryptedPayload,
       metadata,
     }) as Promise<number>;
   } else {
     return create('session', {
       salt,
       nonce,
-      payload: encryptedPayLoadBytes,
+      payload: encryptedPayload,
       metadata,
     }) as Promise<number>;
   }

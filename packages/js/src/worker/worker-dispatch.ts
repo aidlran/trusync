@@ -1,3 +1,4 @@
+import type { PostToAllAction, PostToOneAction } from './types/action.js';
 import type { Request } from './types/request.js';
 import type { Result } from './types/result.js';
 import { CLUSTER_SIZE_DEFAULT } from './worker-defaults.js';
@@ -13,11 +14,11 @@ export type WorkerPostMultiResultCallback<T extends PublicAction = PublicAction>
 ) => unknown;
 
 export interface WorkerDispatch {
-  postToAll: <T extends PublicAction = PublicAction>(
+  postToAll: <T extends PostToAllAction = PostToAllAction>(
     request: Request<T>,
     callback?: WorkerPostMultiResultCallback<T>,
   ) => unknown;
-  postToOne: <T extends PublicAction = PublicAction>(
+  postToOne: <T extends PostToOneAction = PostToOneAction>(
     request: Request<T>,
     callback?: JobCallback<T>,
   ) => unknown;
@@ -38,7 +39,7 @@ export function workerDispatch(
      * @param request The request to be sent.
      * @param callback An optional callback to execute on the results returned from the workers.
      */
-    postToAll<T extends PublicAction>(
+    postToAll<T extends PostToAllAction>(
       // TODO: Further restrict T to specific actions that can be done with one
       request: Request<T>,
       callback?: WorkerPostMultiResultCallback<T>,
@@ -67,7 +68,7 @@ export function workerDispatch(
      * @param request The request to be sent.
      * @param callback An optional callback to execute on the result returned from the worker.
      */
-    postToOne<T extends PublicAction>(
+    postToOne<T extends PostToOneAction>(
       // TODO: Further restrict T to specific actions that must be done with all
       request: Request<T>,
       callback?: JobCallback<T>,

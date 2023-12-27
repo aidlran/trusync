@@ -40,6 +40,45 @@ export async function entropyToMnemonic(entropy: Uint8Array): Promise<string> {
   return mnemonicString.trimEnd();
 }
 
+export function mnemonicToEntropy(mnemonic: string): Uint8Array {
+  const wordArray = mnemonic.split(' ');
+  let bits = '';
+  for (const word of wordArray) {
+    const index = WORDLIST.indexOf(word);
+    if (index < 0) throw new TypeError('Invalid mnemonic');
+    else bits += index.toString(2).padStart(11, '0');
+  }
+  const entropyLength = wordArray.length * 11 - wordArray.length / 3;
+  const checksumLength = BigInt(entropyLength / 32);
+
+  const entropyBits = bits.slice(0, entropyLength);
+  const checksumBits = bits.slice(entropyLength);
+
+  let entropy = 0n;
+  for (let i = 0; i < entropyLength; i++) {
+    entropy <<= 1n;
+    entropy += BigInt(entropyBits[i]);
+  }
+
+  const checksumMask = (1n << checksumLength) - 1n;
+  const calculatedChecksum = entropy & checksumMask;
+  const providedChecksum = BigInt('0b' + checksumBits);
+
+  if (calculatedChecksum !== providedChecksum) {
+    throw new TypeError('Invalid mnemonic');
+  }
+
+  entropy >>= BigInt(checksumLength);
+
+  const entropyBytes = [];
+  while (entropy > 0n) {
+    entropyBytes.unshift(Number(entropy & 0xffn));
+    entropy >>= 8n;
+  }
+
+  return new Uint8Array(entropyBytes);
+}
+
 export async function mnemonicToSeed(mnemonic: string, passphrase = ''): Promise<ArrayBuffer> {
   const ENCODER = new TextEncoder();
 

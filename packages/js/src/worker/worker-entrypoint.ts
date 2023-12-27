@@ -10,7 +10,7 @@ import { importSession } from './jobs/session/import.js';
 globalThis.Buffer = Buffer;
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars -- re-enable once using this
-let session: BIP32Interface;
+let session: BIP32Interface | undefined;
 
 self.onmessage = async (event: MessageEvent<Job<Action> | undefined>) => {
   try {
@@ -22,7 +22,8 @@ self.onmessage = async (event: MessageEvent<Job<Action> | undefined>) => {
 
     switch (event.data.action) {
       case 'session.clear': {
-        throw Error('Not implemented');
+        session = undefined;
+        break;
       }
       case 'session.create': {
         resultPayload = await createSession(save, event.data.payload);

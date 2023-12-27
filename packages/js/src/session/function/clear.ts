@@ -25,7 +25,7 @@ export const construct = (
     });
   };
 
-  fn.asPromise = () => new Promise((resolve) => fn(resolve));
+  fn.asPromise = () => new Promise(fn);
 
   return fn;
 };

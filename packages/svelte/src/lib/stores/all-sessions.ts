@@ -3,8 +3,10 @@ import { type AllSessions, session } from 'trusync';
 
 export function allSessions<T = unknown>(appID?: string): Readable<AllSessions<T>> {
   if (!globalThis.window) {
-    return readable();
+    return readable({});
   }
+
+  session(appID).getSessions();
 
   // https://svelte.dev/docs/svelte-store
   return readable<AllSessions<T>>(undefined, (update) => {

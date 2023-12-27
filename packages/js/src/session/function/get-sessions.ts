@@ -21,6 +21,6 @@ export function getSessions(sessionsObservable: AllSessionsObservable, callback?
       }
       return memorySessions;
     });
-    callback && callback();
+    if (callback) callback();
   });
 }

@@ -39,8 +39,9 @@
     }
   },
   "scripts": {
-    "build": "tsc --project tsconfig.build.json",
-    "lc": "echo truSync JS: $(find bin src -type f ! -name \"*.json\" ! -name \"*.test.*\" -exec cat {} \\; | wc -l) lines",
+    "build": "rm -dr dist; tsc --project tsconfig.build.json",
+    "lc:old": "echo truSync JS: $(find bin src -type f ! -name \"*.json\" ! -name \"*.test.*\" -exec cat {} \\; | wc -l) lines",
+    "lc": "npm run build && echo truSync JS: $(find dist -type f -name \"*.js\" -exec cat {} \\; | wc -l) lines",
     "start": "tsc --watch --preserveWatchOutput --project tsconfig.build.json",
     "test": "vitest run"
   },

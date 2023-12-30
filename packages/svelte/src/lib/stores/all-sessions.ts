@@ -6,8 +6,6 @@ export function allSessions<T = unknown>(appID?: string): Readable<AllSessions<T
     return readable({});
   }
 
-  session(appID).getSessions();
-
   // https://svelte.dev/docs/svelte-store
   return readable<AllSessions<T>>(undefined, (update) => {
     // "[...] called when the number of subscribers goes from zero to one [...]"
